@@ -19,7 +19,7 @@ trait Authenticatable
      */
     public function getAuthIdentifier()
     {
-        return $this->getPk();
+        return $this->data['id'];
     }
 
     /**
@@ -27,7 +27,7 @@ trait Authenticatable
      */
     public function getAuthPassword()
     {
-        return $this->password;
+        return $this->data['password'];
     }
 
     /**
