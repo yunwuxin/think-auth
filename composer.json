@@ -1,0 +1,25 @@
+{
+    "name": "yunwuxin/think-auth",
+    "description": "The Auth Libaray For ThinkPHP5",
+    "authors": [
+        {
+            "name": "yunwuxin",
+            "email": "448901948@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "topthink/think-helper": "^1.0"
+    },
+    "autoload": {
+        "classmap": [
+            "src/Auth.php",
+            "src/Login.php",
+            "src/Authenticatable.php",
+            "src/UserProvider.php"
+        ],
+        "files": [
+            "src/helper.php"
+        ]
+    }
+}
