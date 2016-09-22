@@ -1,5 +1,6 @@
 {
     "name": "yunwuxin/think-auth",
+    "type": "think-extend",
     "description": "The Auth Library For ThinkPHP5",
     "authors": [
         {
@@ -20,6 +21,11 @@
         },
         "files": [
             "src/helper.php"
+        ]
+    },
+    "extra": {
+        "files": [
+            "src/config.php"
         ]
     }
 }

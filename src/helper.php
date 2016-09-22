@@ -51,9 +51,6 @@ function has_role($role)
     return true;
 }
 
-//载入配置
-Config::load(__DIR__ . DS . 'config.php', 'auth');
-
 Hook::add('app_init', function () {
     //注册路由
     Route::controller(Config::get('auth.route'), Config::get('auth.controller'));
