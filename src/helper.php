@@ -52,7 +52,7 @@ function has_role($role)
 }
 
 //载入配置
-Config::load(__DIR__ . 'config.php', 'auth');
+Config::load(__DIR__ . DS . 'config.php', 'auth');
 
 Hook::add('app_init', function () {
     //注册路由
