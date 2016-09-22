@@ -1,23 +1,23 @@
 {
     "name": "yunwuxin/think-auth",
-    "description": "The Auth Libaray For ThinkPHP5",
+    "description": "The Auth Library For ThinkPHP5",
     "authors": [
         {
             "name": "yunwuxin",
             "email": "448901948@qq.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
+        "php": ">=5.5.0",
         "topthink/think-helper": "*"
     },
+    "require-dev": {
+        "topthink/framework": "*"
+    },
     "autoload": {
-        "classmap": [
-            "src/Auth.php",
-            "src/Login.php",
-            "src/Authenticatable.php",
-            "src/UserProvider.php"
-        ],
+        "psr4": {
+            "think\\": "src"
+        },
         "files": [
             "src/helper.php"
         ]

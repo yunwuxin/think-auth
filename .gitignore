@@ -1,4 +1,4 @@
-.gitignore
 .idea/
 vendor/
 composer.lock
+thinkphp/

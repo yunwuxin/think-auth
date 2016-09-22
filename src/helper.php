@@ -8,6 +8,11 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
+use think\Auth;
+use think\Config;
+use think\helper\Hash;
+use think\Hook;
+use think\Route;
 
 /**
  * 加密
@@ -16,14 +21,40 @@
  */
 function encrypt($value)
 {
-    return \think\helper\Hash::make($value);
+    return Hash::make($value);
 }
 
-
 /**
- * @return \think\Auth
+ * @return Auth
  */
 function auth()
 {
-    return \think\Auth::instance();
+    return Auth::make();
 }
+
+/**
+ * @param      $permission
+ * @param null $object
+ * @return bool
+ */
+function can($permission, $object = null)
+{
+    return true;
+}
+
+/**
+ * @param $role
+ * @return bool
+ */
+function has_role($role)
+{
+    return true;
+}
+
+//载入配置
+Config::load(__DIR__ . 'config.php', 'auth');
+
+Hook::add('app_init', function () {
+    //注册路由
+    Route::controller(Config::get('auth.route'), Config::get('auth.controller'));
+});

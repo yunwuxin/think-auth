@@ -11,15 +11,13 @@
 
 namespace think;
 
-
-use think\auth\Authenticatable;
-use think\auth\UserProvider;
+use think\auth\interfaces\Authenticatable;
 
 class Auth
 {
     private static $_instance;
 
-    /** @var  UserProvider */
+    /** @var  Authenticatable */
     protected $provider;
 
     /**
@@ -38,20 +36,18 @@ class Auth
      */
     protected $user;
 
-    protected function __construct(UserProvider $userProvider)
+    protected function __construct()
     {
-        $this->provider = $userProvider;
+        $this->provider = Config::get('auth.provider');
     }
 
     /**
      * @return Auth
      */
-    public static function instance()
+    public static function make()
     {
         if (!(self::$_instance instanceof self)) {
-            $model           = Config::get('auth.model') ?: '\\app\\model\\User';
-            $userProvider    = new UserProvider($model);
-            self::$_instance = new self($userProvider);
+            self::$_instance = new self();
         }
         return self::$_instance;
     }
@@ -75,12 +71,11 @@ class Auth
         $id = Session::get($this->getName()) ?: $this->getRecallerId();
 
         if (is_null($id) && $this->user()) {
-            $id = $this->user()->getAuthIdentifier();
+            $id = $this->user()->getAuthId();
         }
 
         return $id;
     }
-
 
     public function user()
     {
@@ -97,7 +92,7 @@ class Auth
         $user = null;
 
         if (!is_null($id)) {
-            $user = $this->provider->retrieveById($id);
+            $user = call_user_func([$this->provider, 'retrieveById'], $id);
         }
 
         $recaller = $this->getRecaller();
@@ -106,7 +101,7 @@ class Auth
             $user = $this->getUserByRecaller($recaller);
 
             if ($user) {
-                Session::set($this->getName(), $user->getAuthIdentifier());
+                Session::set($this->getName(), $user->getAuthId());
             }
         }
 
@@ -117,7 +112,6 @@ class Auth
     {
         return $this->attempt($credentials, false, false);
     }
-
 
     public function attempt($credentials, $remember = false, $login = true)
     {
@@ -139,14 +133,13 @@ class Auth
         return $user && $this->provider->validateCredentials($user, $credentials);
     }
 
-
     /**
      * @param Authenticatable $user
      * @param bool            $remember
      */
     public function login($user, $remember = false)
     {
-        Session::set($this->getName(), $user->getAuthIdentifier());
+        Session::set($this->getName(), $user->getAuthId());
 
         if ($remember) {
             $this->createRememberTokenIfDoesntExist($user);
@@ -154,10 +147,8 @@ class Auth
             $this->createRecaller($user);
         }
 
-
         $this->setUser($user);
     }
-
 
     public function logout()
     {
@@ -174,7 +165,6 @@ class Auth
         $this->loggedOut = true;
     }
 
-
     protected function clearUserDataFromStorage()
     {
         Session::delete($this->getName());
@@ -185,17 +175,15 @@ class Auth
         }
     }
 
-
     /**
      * @param Authenticatable $user
      * @return mixed
      */
     protected function createRecaller($user)
     {
-        $value = $user->getAuthIdentifier() . '|' . $user->getRememberToken();
+        $value = $user->getAuthId() . '|' . $user->getRememberToken();
         return Cookie::set($this->getRecallerName(), $value);
     }
-
 
     public function setUser($user)
     {
@@ -229,11 +217,8 @@ class Auth
      */
     protected function refreshRememberToken($user)
     {
-        $user->setRememberToken($token = md5(time() . mt_rand(0, 1000)));
-
-        $this->provider->updateRememberToken($user, $token);
+        $user->setRememberToken(md5(time() . mt_rand(0, 1000)));
     }
-
 
     /**
      * @param $recaller
