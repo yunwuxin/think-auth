@@ -17,7 +17,7 @@
         "topthink/framework": "*"
     },
     "autoload": {
-        "psr4": {
+        "psr-4": {
             "think\\": "src"
         },
         "files": [
