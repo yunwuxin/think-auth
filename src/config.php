@@ -9,6 +9,7 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
+//think-auth 配置文件
 return [
     'provider'   => \think\auth\model\User::class,
     'controller' => \think\auth\controller\AuthController::class,
