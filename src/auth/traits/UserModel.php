@@ -68,7 +68,7 @@ trait UserModel
         return static::where($data)->find();
     }
 
-    public static function validateCredentials(self $user, array $credentials)
+    public static function validateCredentials($user, array $credentials)
     {
         $plain = $credentials[self::getPasswordName()];
 

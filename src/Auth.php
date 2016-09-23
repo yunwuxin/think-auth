@@ -115,7 +115,7 @@ class Auth
 
     public function attempt($credentials, $remember = false, $login = true)
     {
-        $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
+        $this->lastAttempted = $user = call_user_func([$this->provider, 'retrieveByCredentials'], $credentials);
 
         if ($this->hasValidCredentials($user, $credentials)) {
             if ($login) {
@@ -130,7 +130,7 @@ class Auth
 
     protected function hasValidCredentials($user, $credentials)
     {
-        return $user && $this->provider->validateCredentials($user, $credentials);
+        return $user && call_user_func([$this->provider, 'validateCredentials'], $user, $credentials);
     }
 
     /**
@@ -231,7 +231,7 @@ class Auth
 
             list($id, $token) = explode('|', $recaller, 2);
 
-            $this->viaRemember = !is_null($user = $this->provider->retrieveByToken($id, $token));
+            $this->viaRemember = !is_null($user = call_user_func([$this->provider, 'retrieveByToken'], $id, $token));
 
             return $user;
         }
