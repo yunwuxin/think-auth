@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "topthink/think-installer": "~1.0",
+        "topthink/think-installer": ">=1.0.8",
         "topthink/think-helper": "*"
     },
     "require-dev": {
