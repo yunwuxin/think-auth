@@ -11,7 +11,8 @@
     "require": {
         "php": ">=5.5.0",
         "topthink/think-installer": ">=1.0.10",
-        "topthink/think-helper": "*"
+        "topthink/think-helper": "*",
+        "yunwuxin/think-custom-request": "*"
     },
     "require-dev": {
         "topthink/framework": "*"
