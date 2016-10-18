@@ -34,6 +34,11 @@ class Auth
      */
     protected $user;
 
+    /**
+     * @var Authenticatable
+     */
+    protected $lastAttempted;
+
     protected function __construct()
     {
         $provider = Config::get('auth.provider');
@@ -137,7 +142,7 @@ class Auth
      */
     public function attempt($credentials, $remember = false, $login = true)
     {
-        $user = call_user_func([$this->provider, 'retrieveByCredentials'], $credentials);
+        $this->lastAttempted = $user = call_user_func([$this->provider, 'retrieveByCredentials'], $credentials);
 
         if ($this->hasValidCredentials($user, $credentials)) {
             if ($login) {
@@ -148,6 +153,25 @@ class Auth
         }
 
         return false;
+    }
+
+    /**
+     * @see attempt
+     * @param array $credentials
+     * @return bool
+     */
+    public function validate(array $credentials = [])
+    {
+        return $this->attempt($credentials, false, false);
+    }
+
+    /**
+     * @see attempt
+     * @return Authenticatable
+     */
+    public function getLastAttempted()
+    {
+        return $this->lastAttempted;
     }
 
     /**
