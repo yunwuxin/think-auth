@@ -29,8 +29,6 @@ class Auth
 
     protected $viaRemember = false;
 
-    protected $lastAttempted;
-
     /**
      * @var Authenticatable
      */
@@ -38,10 +36,16 @@ class Auth
 
     protected function __construct()
     {
-        $this->provider = Config::get('auth.provider');
+        $provider = Config::get('auth.provider');
+
+        if (!is_subclass_of($provider, Authenticatable::class)) {
+            throw new \InvalidArgumentException('the provider must instance of ' . Authenticatable::class);
+        }
+        $this->provider = $provider;
     }
 
     /**
+     * 获取实例
      * @return Auth
      */
     public static function make()
@@ -52,42 +56,58 @@ class Auth
         return self::$_instance;
     }
 
+    /**
+     * 检查用户身份认证
+     * @return bool
+     */
     public function check()
     {
         return !is_null($this->user());
     }
 
+    /**
+     * 是否为游客
+     * @return bool
+     */
     public function guest()
     {
         return !$this->check();
     }
 
+    /**
+     * 获取用户id
+     * @return mixed|null|string
+     */
     public function id()
     {
         if ($this->loggedOut) {
-            return;
+            return null;
         }
 
-        $id = Session::get($this->getName()) ?: $this->getRecallerId();
+        $id = Session::get($this->getSessionKey()) ?: $this->getRecallerId();
 
         if (is_null($id) && $this->user()) {
-            $id = $this->user()->getAuthId();
+            $id = $this->user()->getId();
         }
 
         return $id;
     }
 
+    /**
+     * 获取当前通过认证的用户
+     * @return mixed|null|Authenticatable
+     */
     public function user()
     {
         if ($this->loggedOut) {
-            return;
+            return null;
         }
 
         if (!is_null($this->user)) {
             return $this->user;
         }
 
-        $id = Session::get($this->getName());
+        $id = Session::get($this->getSessionKey());
 
         $user = null;
 
@@ -101,21 +121,23 @@ class Auth
             $user = $this->getUserByRecaller($recaller);
 
             if ($user) {
-                Session::set($this->getName(), $user->getAuthId());
+                Session::set($this->getSessionKey(), $user->getId());
             }
         }
 
         return $this->user = $user;
     }
 
-    public function validate(array $credentials = [])
-    {
-        return $this->attempt($credentials, false, false);
-    }
-
+    /**
+     * 尝试认证用户
+     * @param      $credentials
+     * @param bool $remember
+     * @param bool $login
+     * @return bool
+     */
     public function attempt($credentials, $remember = false, $login = true)
     {
-        $this->lastAttempted = $user = call_user_func([$this->provider, 'retrieveByCredentials'], $credentials);
+        $user = call_user_func([$this->provider, 'retrieveByCredentials'], $credentials);
 
         if ($this->hasValidCredentials($user, $credentials)) {
             if ($login) {
@@ -128,18 +150,25 @@ class Auth
         return false;
     }
 
+    /**
+     * 认证用户
+     * @param $user
+     * @param $credentials
+     * @return bool
+     */
     protected function hasValidCredentials($user, $credentials)
     {
         return $user && call_user_func([$this->provider, 'validateCredentials'], $user, $credentials);
     }
 
     /**
+     * 保存登录信息
      * @param Authenticatable $user
      * @param bool            $remember
      */
-    public function login($user, $remember = false)
+    public function login(Authenticatable $user, $remember = false)
     {
-        Session::set($this->getName(), $user->getAuthId());
+        Session::set($this->getSessionKey(), $user->getId());
 
         if ($remember) {
             $this->createRememberTokenIfDoesntExist($user);
@@ -150,6 +179,9 @@ class Auth
         $this->setUser($user);
     }
 
+    /**
+     * 注销用户信息
+     */
     public function logout()
     {
         $user = $this->user();
@@ -165,9 +197,12 @@ class Auth
         $this->loggedOut = true;
     }
 
+    /**
+     * 清除用户信息
+     */
     protected function clearUserDataFromStorage()
     {
-        Session::delete($this->getName());
+        Session::delete($this->getSessionKey());
 
         if (!is_null($this->getRecaller())) {
             $recaller = $this->getRecallerName();
@@ -176,30 +211,34 @@ class Auth
     }
 
     /**
+     * 创建记住用户信息
      * @param Authenticatable $user
      * @return mixed
      */
     protected function createRecaller($user)
     {
-        $value = $user->getAuthId() . '|' . $user->getRememberToken();
+        $value = $user->getId() . '|' . $user->getRememberToken();
         return Cookie::set($this->getRecallerName(), $value);
     }
 
-    public function setUser($user)
+    /**
+     * 设置当前认证的用户
+     * @param Authenticatable $user
+     */
+    public function setUser(Authenticatable $user)
     {
         $this->user = $user;
 
         $this->loggedOut = false;
     }
 
+    /**
+     * 获取当前认证的用户
+     * @return Authenticatable
+     */
     public function getUser()
     {
         return $this->user;
-    }
-
-    public function getLastAttempted()
-    {
-        return $this->lastAttempted;
     }
 
     /**
@@ -276,7 +315,11 @@ class Auth
         return count($segments) == 2 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
     }
 
-    public function getName()
+    /**
+     * Session键名
+     * @return string
+     */
+    protected function getSessionKey()
     {
         return 'login_' . md5(get_class($this));
     }

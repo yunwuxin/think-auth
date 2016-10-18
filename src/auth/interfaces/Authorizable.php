@@ -8,37 +8,23 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-namespace think\auth;
 
-abstract class Role
+namespace think\auth\interfaces;
+
+use think\auth\Role;
+
+interface Authorizable
 {
-    /** @var array 权限列表 */
-    protected $permissions = [];
+    /**
+     * 获取用户角色
+     * @return Role
+     */
+    public function getRole();
 
-    /** @var string 角色标识 */
-    protected $name;
-
-    public function __construct($name, $permissions = [])
-    {
-        $this->name        = $name;
-        $this->permissions = $permissions;
-    }
 
     /**
-     * 设置角色权限
-     * @param $permissions
+     * 是否为超级管理员[拥有所有的权限]
+     * @return boolean
      */
-    public function setPermissions($permissions)
-    {
-        $this->permissions = $permissions;
-    }
-
-    /**
-     * 获取权限列表
-     * @return array
-     */
-    public function getPermissions()
-    {
-        return $this->permissions;
-    }
+    public function isSuperAdmin();
 }

@@ -13,10 +13,10 @@ namespace think\auth\traits;
 
 use think\helper\Hash;
 
-trait UserModel
+trait AuthenticatableUser
 {
 
-    public function getAuthId()
+    public function getId()
     {
         return $this->data[$this->getPk()];
     }

@@ -11,6 +11,9 @@
 namespace think\auth\model;
 
 use think\auth\interfaces\Authenticatable;
+use think\auth\interfaces\Authorizable;
+use think\auth\traits\AuthenticatableUser;
+use think\auth\traits\AuthorizableUser;
 use think\auth\traits\UserModel;
 use think\Model;
 
@@ -19,7 +22,7 @@ use think\Model;
  * Class User
  * @package think\auth\model
  */
-class User extends Model implements Authenticatable
+class User extends Model implements Authenticatable, Authorizable
 {
-    use UserModel;
+    use AuthenticatableUser, AuthorizableUser;
 }

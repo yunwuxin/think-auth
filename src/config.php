@@ -11,7 +11,23 @@
 
 //think-auth 配置文件
 return [
-    'provider'   => \think\auth\model\User::class,
-    'controller' => \think\auth\controller\AuthController::class,
-    'route'      => 'auth'
+    /**
+     * 用户对象提供者，需实现 \think\auth\interfaces\Authenticatable
+     */
+    'provider'           => \think\auth\model\User::class,
+
+    /**
+     * 登录控制器
+     */
+    'controller'         => \think\auth\controller\AuthController::class,
+
+    /**
+     * 登录控制器路由
+     */
+    'route'              => 'auth',
+
+    /**
+     * 对象权限列表
+     */
+    'object_permissions' => []
 ];

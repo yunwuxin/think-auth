@@ -18,7 +18,7 @@ interface Authenticatable
      * 获取用户ID
      * @return mixed
      */
-    public function getAuthId();
+    public function getId();
 
     /**
      * 获取“记住我”令牌
