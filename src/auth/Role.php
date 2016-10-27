@@ -10,18 +10,22 @@
 // +----------------------------------------------------------------------
 namespace think\auth;
 
-abstract class Role
+class Role
 {
     /** @var array 权限列表 */
     protected $permissions = [];
 
-    /** @var string 角色标识 */
+    /** @var string 角色名称 */
     protected $name;
 
-    public function __construct($name, $permissions = [])
+    public function __construct($name)
     {
-        $this->name        = $name;
-        $this->permissions = $permissions;
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**

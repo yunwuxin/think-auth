@@ -17,14 +17,30 @@ interface Authorizable
 {
     /**
      * 获取用户角色
-     * @return Role
+     * @return Role[]
      */
-    public function getRole();
-
+    public function getRoles();
 
     /**
-     * 是否为超级管理员[拥有所有的权限]
-     * @return boolean
+     * 是否具有某个角色
+     * @param array|string $name
+     * @param bool         $requireAll
+     * @return bool
      */
-    public function isSuperAdmin();
+    public function hasRole($name, $requireAll = false);
+
+    /**
+     * 获取用户的所有权限
+     * @return array
+     */
+    public function getPermissions();
+
+    /**
+     * 是否具有某个权限
+     * @param      $name
+     * @param bool $requireAll
+     * @return bool
+     */
+    public function hasPermission($name, $requireAll = false);
+
 }

@@ -18,20 +18,82 @@ trait AuthorizableUser
 {
     /**
      * 获取用户角色
-     * @return Role
+     * @return Role[]
      */
-    public function getRole()
+    public function getRoles()
     {
         throw new \LogicException('You must override the getRole() method in the concrete user class.');
     }
 
     /**
-     * 是否为超级管理员[拥有所有的权限]
-     * @return boolean
+     * 是否具有某个角色
+     * @param array|string $name
+     * @param bool         $requireAll
+     * @return bool
      */
-    public function isSuperAdmin()
+    public function hasRole($name, $requireAll = false)
     {
-        return false;
+        if (is_array($name)) {
+            foreach ($name as $roleName) {
+                $hasRole = $this->hasRole($roleName);
+                if ($hasRole && !$requireAll) {
+                    return true;
+                } elseif (!$hasRole && $requireAll) {
+                    return false;
+                }
+            }
+            return $requireAll;
+        } else {
+            foreach ($this->getRoles() as $role) {
+                if ($role->getName() == $name) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * 获取用户的所有权限
+     * @return array
+     */
+    public function getPermissions()
+    {
+        $roles       = $this->getRoles();
+        $permissions = [];
+        array_map(function (Role $role) use (&$permissions) {
+            $permissions = array_merge($permissions, $role->getPermissions());
+        }, $roles);
+        return $permissions;
+    }
+
+    /**
+     * 是否具有某个权限
+     * @param      $name
+     * @param bool $requireAll
+     * @return bool
+     */
+    public function hasPermission($name, $requireAll = false)
+    {
+        if (is_array($name)) {
+            foreach ($name as $permissionName) {
+                $hasPermission = $this->hasPermission($permissionName);
+                if ($hasPermission && !$requireAll) {
+                    return true;
+                } elseif (!$hasPermission && $requireAll) {
+                    return false;
+                }
+            }
+            return $requireAll;
+        } else {
+            foreach ($this->getPermissions() as $permission) {
+                //TODO 正则匹配
+                if ($permission == $name) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /**
@@ -42,9 +104,8 @@ trait AuthorizableUser
      */
     public function can($action, $object = null)
     {
-        $role               = $this->getRole();
-        $permissions        = (array) $role->getPermissions();
-        $object_permissions = Config::get('auth.object_permissions', []);
+        $object_permissions          = Config::get('auth.object_permissions', []);
+        $object_permission_namespace = Config::get('auth.object_permission_namespace');
         if (!is_null($object)) {
             if (is_string($object)) {
                 //直接传入类名的情况
@@ -53,10 +114,15 @@ trait AuthorizableUser
             } else {
                 $object_class = get_class($object);
             }
-            if (!array_key_exists($object_class, $object_permissions)) {
+            if (array_key_exists($object_class, $object_permissions)) {
+                $permission_class = $object_permissions[$object_class];
+            } elseif ($object_permission_namespace) {
+                //自动搜索
+                $permission_class = $object_permission_namespace . join('', array_slice(explode('\\', $object_class), -1));
+            } else {
                 return false;
             }
-            $permission_class = $object_permissions[$object_class];
+
             if (!class_exists($permission_class)) {
                 return false;
             }
@@ -78,7 +144,7 @@ trait AuthorizableUser
 
         } else {
             //直接检查角色里的权限列表定义
-            return in_array($action, $permissions);
+            return in_array($action, $this->getPermissions());
         }
     }
 }
