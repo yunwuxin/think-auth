@@ -40,7 +40,7 @@ class Authorization
             $permissions = $routeInfo['option']['permissions'];
 
             if (isset($routeInfo['option']['rest']) && $this->isAssoc($permissions)) {
-                if (!$user->hasPermission($permissions['*'], true)) {
+                if (isset($permissions['*']) && !$user->hasPermission($permissions['*'], true)) {
                     throw new AuthorizationException;
                 }
                 if (isset($permissions[$routeInfo['option']['rest']]) && !$user->hasPermission($permissions[$routeInfo['option']['rest']], true)) {
