@@ -11,6 +11,10 @@
 
 namespace think\auth\behavior;
 
+use think\auth\exception\AuthorizationException;
+use think\auth\interfaces\Authenticatable;
+use think\auth\interfaces\Authorizable;
+
 /**
  * 权限管理
  * Class Authorization
@@ -20,8 +24,41 @@ class Authorization
 {
     public function run()
     {
-        if (auth()->guest()) {
-            return response('Unauthorized.', 401);
+
+        /** @var Authenticatable|Authorizable $user */
+        $user = auth()->user();
+
+        $routeInfo = request()->routeInfo();
+
+        if (isset($routeInfo['option']['roles'])) {
+            if (!$user->hasRole($routeInfo['option']['roles'])) {
+                throw new AuthorizationException();
+            }
         }
+
+        if (isset($routeInfo['option']['permissions'])) {
+            $permissions = $routeInfo['option']['permissions'];
+
+            if (isset($routeInfo['option']['rest']) && $this->isAssoc($permissions)) {
+                if (!$user->hasPermission($permissions['*'], true)) {
+                    throw new AuthorizationException;
+                }
+                if (isset($permissions[$routeInfo['option']['rest']]) && !$user->hasPermission($permissions[$routeInfo['option']['rest']], true)) {
+                    throw new AuthorizationException;
+                }
+            } else if (!$user->hasPermission($permissions, true)) {
+                throw new AuthorizationException;
+            }
+        }
+    }
+
+    /**
+     * 是否为关联数组
+     * @param array $arr
+     * @return bool
+     */
+    private function isAssoc($arr)
+    {
+        return is_array($arr) && array_keys($arr) !== range(0, count($arr) - 1);
     }
 }
