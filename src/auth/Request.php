@@ -12,7 +12,7 @@
 namespace think\auth;
 
 
-use BaseRequest;
+use think\BaseRequest;
 use think\auth\traits\AuthUser;
 
 class Request extends BaseRequest
