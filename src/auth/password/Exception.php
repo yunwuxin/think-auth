@@ -2,20 +2,26 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006-2015 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006-2016 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-namespace yunwuxin\auth\exception;
 
-use think\exception\HttpException;
+namespace yunwuxin\auth\password;
 
-class AuthenticationException extends HttpException
+class Exception extends \InvalidArgumentException
 {
-    public function __construct()
+    const INVALID_USER = 'passwords.user';
+
+    const INVALID_PASSWORD = 'passwords.password';
+
+    const INVALID_TOKEN = 'passwords.token';
+
+    public function __construct($message)
     {
-        parent::__construct(401, "Unauthorized.");
+        parent::__construct($message);
     }
+
 }

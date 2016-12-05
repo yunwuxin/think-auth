@@ -9,9 +9,9 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-namespace think\auth\interfaces;
+namespace yunwuxin\auth\interfaces;
 
-use think\auth\Role;
+use yunwuxin\auth\Role;
 
 interface Authorizable
 {

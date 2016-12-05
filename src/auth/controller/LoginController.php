@@ -8,14 +8,11 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-namespace yunwuxin\auth\exception;
+namespace yunwuxin\auth\controller;
 
-use think\exception\HttpException;
+use yunwuxin\auth\traits\Login;
 
-class AuthenticationException extends HttpException
+class LoginController
 {
-    public function __construct()
-    {
-        parent::__construct(401, "Unauthorized.");
-    }
+    use Login;
 }

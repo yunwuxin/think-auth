@@ -9,11 +9,11 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-namespace think\auth;
+namespace yunwuxin\auth;
 
 
 use think\BaseRequest;
-use think\auth\traits\AuthUser;
+use yunwuxin\auth\traits\AuthUser;
 
 class Request extends BaseRequest
 {

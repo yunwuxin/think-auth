@@ -8,13 +8,14 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-namespace think\auth\model;
+namespace yunwuxin\auth\model;
 
-use think\auth\interfaces\Authenticatable;
-use think\auth\interfaces\Authorizable;
-use think\auth\traits\AuthenticatableUser;
-use think\auth\traits\AuthorizableUser;
-use think\auth\traits\UserModel;
+use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\interfaces\Authorizable;
+use yunwuxin\auth\interfaces\CanResetPassword;
+use yunwuxin\auth\traits\AuthenticatableUser;
+use yunwuxin\auth\traits\AuthorizableUser;
+use yunwuxin\auth\traits\CanResetPasswordUser;
 use think\Model;
 
 /**
@@ -22,7 +23,7 @@ use think\Model;
  * Class User
  * @package think\auth\model
  */
-class User extends Model implements Authenticatable, Authorizable
+class User extends Model implements Authenticatable, Authorizable, CanResetPassword
 {
-    use AuthenticatableUser, AuthorizableUser;
+    use AuthenticatableUser, AuthorizableUser, CanResetPasswordUser;
 }

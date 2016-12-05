@@ -9,11 +9,11 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-namespace think\auth\behavior;
+namespace yunwuxin\auth\behavior;
 
-use think\auth\exception\AuthorizationException;
-use think\auth\interfaces\Authenticatable;
-use think\auth\interfaces\Authorizable;
+use yunwuxin\auth\exception\AuthorizationException;
+use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\interfaces\Authorizable;
 
 /**
  * 权限管理

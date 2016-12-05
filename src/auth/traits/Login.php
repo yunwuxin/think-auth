@@ -9,45 +9,68 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-namespace think\auth\traits;
+namespace yunwuxin\auth\traits;
 
 use think\exception\ValidateException;
 use think\Request;
+use think\Response;
 use think\Validate;
 
 trait Login
 {
     /**
-     * 登录时的验证规则，可以重写覆盖
-     * @var array
+     * 登录
+     * @param Request $request
      */
-    protected $validateRules = [
-        'username|用户名' => 'require',
-        'password|密码'  => 'require'
-    ];
+    public function login(Request $request)
+    {
+        $this->validate($request);
+
+        if ($this->attempt($request)) {
+            return $this->logined(auth()->user()) ?: redirect($this->redirectPath())->restore();
+        }
+
+        throw new ValidateException([$this->username() => '用户名或密码错误']);
+    }
 
     /**
-     * 是否批量验证
-     * @var bool
+     * 登录页面
      */
-    protected $validateBatch = true;
+    public function showLoginForm()
+    {
+        if (auth()->user()) {
+            return redirect($this->redirectPath());
+        }
+        return view('auth/login');
+    }
+
+    /**
+     * 登出
+     * @return \think\response\Redirect
+     */
+    public function logout()
+    {
+        auth()->logout();
+
+        return redirect('/');
+    }
 
     /**
      * 获取用户名字段名
      * @return string
      */
-    protected function loginUsername()
+    protected function username()
     {
-        return property_exists($this, 'username') ? $this->username : 'username';
+        return 'username';
     }
 
     /**
      * 获取密码字段名
      * @return string
      */
-    protected function loginPassword()
+    protected function password()
     {
-        return property_exists($this, 'password') ? $this->password : 'password';
+        return 'password';
     }
 
     /**
@@ -55,25 +78,21 @@ trait Login
      * @param Request $request
      * @return array
      */
-    protected function getCredentials(Request $request)
+    protected function credentials(Request $request)
     {
         return [
-            $this->loginUsername() => $request->param($this->loginUsername()),
-            $this->loginPassword() => $request->param($this->loginPassword())
+            $this->username() => $request->param($this->username()),
+            $this->password() => $request->param($this->password())
         ];
     }
 
     /**
-     * 登录成功后的回调，可代替默认的跳转
+     * @param $user
+     * @return Response
      */
-    protected function handleUserWasAuthenticated()
+    protected function logined($user)
     {
-
-        if (method_exists($this, 'authenticated')) {
-            return $this->authenticated(auth()->user());
-        }
-
-        return redirect($this->redirectPath())->restore();
+        //
     }
 
     /**
@@ -82,56 +101,46 @@ trait Login
      */
     protected function redirectPath()
     {
-        if (property_exists($this, 'redirectPath')) {
-            return $this->redirectPath;
-        }
-
         return '/';
     }
 
     /**
-     * 获取登录地址
-     * @return string
+     * 生成验证器
+     * @param Request $request
+     * @return Validate
      */
-    protected function loginPath()
+    protected function validator(Request $request)
     {
-        return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
+        return Validate::make([
+            $this->username() => 'require',
+            $this->password() => 'require'
+        ], [
+            $this->username() => '用户名',
+            $this->password() => '密码'
+        ])->batch(true);
     }
 
     /**
-     * 登录
+     * 验证
      * @param Request $request
      */
-    public function postLogin(Request $request)
+    protected function validate(Request $request)
     {
-        if (!empty($this->validateRules)) {
-            $validate = Validate::make($this->validateRules);
+        $validator = $this->validator($request);
 
-            $validate->batch($this->validateBatch);
-
-            if (!$validate->check($request->param())) {
-                throw new ValidateException($validate->getError());
-            }
+        if (!$validator->check($request->param())) {
+            throw new ValidateException($validator->getError());
         }
-
-        $credentials = $this->getCredentials($request);
-
-        if (auth()->attempt($credentials, $request->has('remember'))) {
-            return $this->handleUserWasAuthenticated();
-        }
-
-        throw new ValidateException([$this->loginUsername() => '用户名或密码错误']);
     }
 
     /**
-     * 登出
-     * @return \think\response\Redirect
+     * 登录验证
+     * @param Request $request
+     * @return bool
      */
-    public function getLogout()
+    protected function attempt(Request $request)
     {
-        auth()->logout();
-
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        return auth()->attempt($this->credentials($request), $request->has('remember'));
     }
 
 }

@@ -9,9 +9,9 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-namespace think\auth\traits;
+namespace yunwuxin\auth\traits;
 
-use think\auth\Role;
+use yunwuxin\auth\Role;
 use think\Config;
 
 trait AuthorizableUser

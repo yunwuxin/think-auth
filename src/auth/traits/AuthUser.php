@@ -9,10 +9,10 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-namespace think\auth\traits;
+namespace yunwuxin\auth\traits;
 
 
-use think\Auth;
+use yunwuxin\Auth;
 
 trait AuthUser
 {

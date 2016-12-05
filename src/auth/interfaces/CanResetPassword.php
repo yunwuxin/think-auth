@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006-2015 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006-2016 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -11,37 +11,20 @@
 
 namespace yunwuxin\auth\interfaces;
 
-interface Authenticatable
+interface CanResetPassword
 {
 
     /**
-     * 获取用户ID
+     * 获取邮箱或者手机号码
      * @return mixed
      */
-    public function getAuthId();
+    public function getEmailForResetPassword();
 
     /**
-     * 获取密码
-     * @return mixed
-     */
-    public function getAuthPassword();
-
-    /**
-     * 获取“记住我”令牌
-     * @return mixed
-     */
-    public function getRememberToken();
-
-    /**
-     * 设置“记住我”令牌
+     * 发送重置密码token通知
      * @param $token
      * @return mixed
      */
-    public function setRememberToken($token);
+    public function sendPasswordResetNotification($token);
 
-    /**
-     * 获取“记住我”令牌字段名
-     * @return mixed
-     */
-    public function getRememberTokenName();
 }

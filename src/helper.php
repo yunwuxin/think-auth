@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-use think\Auth;
+use yunwuxin\Auth;
 use think\Config;
 use think\helper\Hash;
 use think\Hook;
@@ -29,7 +29,7 @@ function encrypt($value)
  */
 function auth()
 {
-    return Auth::make();
+    return Auth::instance();
 }
 
 /**
@@ -53,5 +53,27 @@ function has_role($role)
 
 Hook::add('app_init', function () {
     //注册路由
-    Route::controller(Config::get('auth.route'), Config::get('auth.controller'));
+    $route = Config::get('auth.route');
+    if ($route) {
+        Route::group($route, function () {
+            //登录
+            Route::get("login", "\\yunwuxin\\auth\\controller\\LoginController@showLoginForm");
+            Route::post("login", "\\yunwuxin\\auth\\controller\\LoginController@login");
+            Route::get("logout", "\\yunwuxin\\auth\\controller\\LoginController@logout");
+            //注册
+            Route::get('register', "\\yunwuxin\\auth\\controller\\RegisterController@showRegisterForm");
+            Route::post("register", "\\yunwuxin\\auth\\controller\\LoginController@register");
+            //忘记密码
+            Route::get('password/forget', "\\yunwuxin\\auth\\controller\\ForgotPasswordController@showSendPasswordResetEmailForm");
+            Route::post("password/forget", "\\yunwuxin\\auth\\controller\\ForgotPasswordController@sendResetLinkEmail");
+            //重设密码
+            Route::get([
+                'AUTH_PASSWORD',
+                'password/reset'
+            ], "\\yunwuxin\\auth\\controller\\ResetPasswordController@showResetForm");
+            Route::post("password/reset", "\\yunwuxin\\auth\\controller\\ResetPasswordController@reset");
+
+        });
+
+    }
 });

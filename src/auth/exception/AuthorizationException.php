@@ -9,7 +9,7 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-namespace think\auth\exception;
+namespace yunwuxin\auth\exception;
 
 use think\exception\HttpException;
 

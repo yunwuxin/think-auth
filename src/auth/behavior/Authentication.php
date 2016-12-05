@@ -8,9 +8,9 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-namespace think\auth\behavior;
+namespace yunwuxin\auth\behavior;
 
-use think\auth\exception\AuthenticationException;
+use yunwuxin\auth\exception\AuthenticationException;
 
 /**
  * 用户身份认证
