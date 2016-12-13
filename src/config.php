@@ -16,5 +16,14 @@ return [
         'model' => \yunwuxin\auth\model\User::class
     ],
     'guard'    => 'session',
-    'route'    => 'auth'
+    //设为false,则不注册路由
+    'route'    => [
+        'group'       => 'auth',
+        'controllers' => [
+            'login'    => \yunwuxin\auth\controller\LoginController::class,
+            'register' => \yunwuxin\auth\controller\RegisterController::class,
+            'forgot'   => \yunwuxin\auth\controller\ForgotPasswordController::class,
+            'reset'    => \yunwuxin\auth\controller\ResetPasswordController::class
+        ]
+    ]
 ];

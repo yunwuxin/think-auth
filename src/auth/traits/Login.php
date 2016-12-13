@@ -114,7 +114,7 @@ trait Login
         return Validate::make([
             $this->username() => 'require',
             $this->password() => 'require'
-        ], [
+        ], [], [
             $this->username() => '用户名',
             $this->password() => '密码'
         ])->batch(true);

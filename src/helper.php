@@ -55,24 +55,24 @@ Hook::add('app_init', function () {
     //注册路由
     $route = Config::get('auth.route');
     if ($route) {
-        Route::group($route, function () {
+        $controllers = $route['controllers'];
+        Route::group($route['group'], function () use ($controllers) {
             //登录
-            Route::get("login", "\\yunwuxin\\auth\\controller\\LoginController@showLoginForm");
-            Route::post("login", "\\yunwuxin\\auth\\controller\\LoginController@login");
-            Route::get("logout", "\\yunwuxin\\auth\\controller\\LoginController@logout");
+            Route::get("login", "\\" . $controllers['login'] . "@showLoginForm");
+            Route::post("login", "\\" . $controllers['login'] . "@login");
+            Route::get("logout", "\\" . $controllers['login'] . "@logout");
             //注册
-            Route::get('register', "\\yunwuxin\\auth\\controller\\RegisterController@showRegisterForm");
-            Route::post("register", "\\yunwuxin\\auth\\controller\\LoginController@register");
+            Route::get('register', "\\" . $controllers['register'] . "@showRegisterForm");
+            Route::post("register", "\\" . $controllers['register'] . "@register");
             //忘记密码
-            Route::get('password/forget', "\\yunwuxin\\auth\\controller\\ForgotPasswordController@showSendPasswordResetEmailForm");
-            Route::post("password/forget", "\\yunwuxin\\auth\\controller\\ForgotPasswordController@sendResetLinkEmail");
+            Route::get('password/forgot', "\\" . $controllers['forgot'] . "@showSendPasswordResetEmailForm");
+            Route::post("password/forgot", "\\" . $controllers['forgot'] . "@sendResetLinkEmail");
             //重设密码
             Route::get([
                 'AUTH_PASSWORD',
                 'password/reset'
-            ], "\\yunwuxin\\auth\\controller\\ResetPasswordController@showResetForm");
-            Route::post("password/reset", "\\yunwuxin\\auth\\controller\\ResetPasswordController@reset");
-
+            ], "\\" . $controllers['reset'] . "@showResetForm");
+            Route::post("password/reset", "\\" . $controllers['reset'] . "@reset");
         });
 
     }

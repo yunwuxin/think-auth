@@ -11,14 +11,13 @@
 
 namespace yunwuxin\auth\traits;
 
-
 use yunwuxin\Auth;
 
 trait AuthUser
 {
     public function auth()
     {
-        return Auth::make();
+        return Auth::instance();
     }
 
     public function user()

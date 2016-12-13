@@ -44,7 +44,7 @@ class Session extends Guard implements StatefulGuard
      */
     public function check()
     {
-        // TODO: Implement check() method.
+        return !is_null($this->user());
     }
 
     /**
@@ -114,11 +114,13 @@ class Session extends Guard implements StatefulGuard
      * 设置当前用户
      *
      * @param  Authenticatable $user
-     * @return void
+     * @return Session
      */
     public function setUser(Authenticatable $user)
     {
-        // TODO: Implement setUser() method.
+        $this->user = $user;
+
+        return $this;
     }
 
     /**
@@ -155,7 +157,7 @@ class Session extends Guard implements StatefulGuard
 
     protected function validRecaller($recaller)
     {
-        if (!is_string($recaller) || strrpos('|', $recaller) === false) {
+        if (!is_string($recaller) || !Str::contains($recaller, '|')) {
             return false;
         }
 

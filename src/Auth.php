@@ -18,6 +18,7 @@ use yunwuxin\auth\Guard;
 use yunwuxin\auth\guard\Session;
 use yunwuxin\auth\guard\Token;
 use yunwuxin\auth\interfaces\StatefulGuard;
+use yunwuxin\auth\Provider;
 
 /**
  * Class Auth
@@ -55,6 +56,10 @@ class Auth
             : $this->guards[$name] = $this->buildGuard($name);
     }
 
+    /**
+     * @param null $provider
+     * @return Provider
+     */
     public function buildProvider($provider = null)
     {
         $config = Config::get('auth.provider');
@@ -84,7 +89,7 @@ class Auth
 
     public function __call($method, $parameters)
     {
-        return $this->guard()->{$method}(...$parameters);
+        return call_user_func_array([$this->guard(), $method], $parameters);
     }
 
 }

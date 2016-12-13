@@ -25,6 +25,7 @@ class Token
 
         Cache::set(self::getCacheKey($user), self::getPayload($email, $token));
 
+        return $token;
     }
 
     protected static function getPayload($email, $token)
