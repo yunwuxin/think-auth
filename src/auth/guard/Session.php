@@ -326,6 +326,6 @@ class Session extends Guard implements StatefulGuard
     protected function createRecaller(Authenticatable $user)
     {
         $value = $user->getAuthId() . '|' . $user->getRememberToken();
-        return Cookie::set($this->getRecallerName(), $value);
+        Cookie::forever($this->getRecallerName(), $value);
     }
 }
