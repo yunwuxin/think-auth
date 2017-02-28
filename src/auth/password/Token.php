@@ -30,7 +30,7 @@ class Token
 
     protected static function getPayload($email, $token)
     {
-        return ['email' => $email, 'token' => $token, 'created_time' => time()];
+        return ['email' => $email, 'token' => $token, 'create_time' => time()];
     }
 
     protected static function getCacheKey(CanResetPassword $user)
