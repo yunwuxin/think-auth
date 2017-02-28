@@ -21,7 +21,7 @@ class Authentication
 {
     public function run()
     {
-        if (auth()->guest()) {
+        if (!auth()->check()) {
             throw new AuthenticationException;
         }
 
