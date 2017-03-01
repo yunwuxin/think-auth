@@ -11,6 +11,8 @@
 
 namespace yunwuxin\auth\traits;
 
+use function method_exists;
+use think\helper\Str;
 use yunwuxin\auth\exception\AuthorizationException;
 use yunwuxin\auth\Request;
 
@@ -24,12 +26,25 @@ class Authorize
     public function __call($method, $args)
     {
         if (preg_match('/^authorize_(\w+)(?:\|(\w+))?$/', $method, $match)) {
-            $user   = Request::instance()->user();
-            $action = $match[1];
-            $object = $match[2];
 
-            if (!$user || !$user->can($action, $object)) {
-                throw new AuthorizationException;
+            $action = $match[1];
+            $object = null;
+            if ($match[2] && isset($this->$match[2])) {
+                $object = $this->$match[2];
+            }
+
+            $method = "authorize" . Str::studly($action);
+
+            if (method_exists($this, $method)) {
+                if (!$this->$method($object)) {
+                    throw new AuthorizationException;
+                }
+            } else {
+                $user = Request::instance()->user();
+
+                if (!$user || !$user->can($action, $object)) {
+                    throw new AuthorizationException;
+                }
             }
         } else {
             throw new \ErrorException("Call to undefined method {$method}");
