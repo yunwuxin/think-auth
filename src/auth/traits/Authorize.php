@@ -11,7 +11,6 @@
 
 namespace yunwuxin\auth\traits;
 
-use function method_exists;
 use think\helper\Str;
 use yunwuxin\auth\exception\AuthorizationException;
 use yunwuxin\auth\Request;
@@ -21,7 +20,7 @@ use yunwuxin\auth\Request;
  * Class Authorize
  * @package yunwuxin\auth\traits
  */
-class Authorize
+trait Authorize
 {
     protected function authorize($action, $object = null)
     {
