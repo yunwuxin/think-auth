@@ -119,7 +119,7 @@ trait AuthorizableUser
                 $permission_class = $object_permissions[$object_class];
             } elseif ($object_permission_namespace) {
                 //自动搜索
-                $permission_class = $object_permission_namespace . join('', array_slice(explode('\\', $object_class), -1));
+                $permission_class = $object_permission_namespace . join('', array_slice(explode('\\', $object_class), -1)) . 'Policy';
             } else {
                 return false;
             }
