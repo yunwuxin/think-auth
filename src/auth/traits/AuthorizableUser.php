@@ -11,6 +11,7 @@
 
 namespace yunwuxin\auth\traits;
 
+use const true;
 use yunwuxin\auth\Role;
 use think\Config;
 
@@ -144,7 +145,7 @@ trait AuthorizableUser
 
         } else {
             //直接检查角色里的权限列表定义
-            return in_array($action, $this->getPermissions());
+            return $this->hasPermission($action, true);
         }
     }
 }

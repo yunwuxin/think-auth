@@ -14,6 +14,7 @@ use think\Cookie;
 use think\helper\Str;
 use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\Guard;
+use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\StatefulGuard;
 
 class Session extends Guard implements StatefulGuard
@@ -50,12 +51,16 @@ class Session extends Guard implements StatefulGuard
     /**
      * 获取通过认证的用户
      *
-     * @return Authenticatable|null
+     * @return Authenticatable|Authorizable|null
      */
     public function user()
     {
         if ($this->loggedOut) {
             return null;
+        }
+
+        if (!is_null($this->user)) {
+            return $this->user;
         }
 
         $id = \think\Session::get($this->getName());
@@ -118,9 +123,18 @@ class Session extends Guard implements StatefulGuard
      */
     public function setUser(Authenticatable $user)
     {
-        $this->user = $user;
-
+        $this->user      = $user;
+        $this->loggedOut = false;
         return $this;
+    }
+
+    /**
+     * 获取上次通过认证的用户
+     * @return Authenticatable
+     */
+    public function getLastAttempted()
+    {
+        return $this->lastAttempted;
     }
 
     /**

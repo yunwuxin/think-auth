@@ -15,12 +15,14 @@ use think\exception\ValidateException;
 use think\Request;
 use think\Response;
 use think\Validate;
+use yunwuxin\auth\model\User;
 
 trait Login
 {
     /**
      * 登录
      * @param Request $request
+     * @return Response
      */
     public function login(Request $request)
     {

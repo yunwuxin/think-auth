@@ -43,4 +43,12 @@ interface Authorizable
      */
     public function hasPermission($name, $requireAll = false);
 
+    /**
+     * 检查权限
+     * @param      $action
+     * @param null $object
+     * @return bool|mixed
+     */
+    public function can($action, $object = null);
+
 }
