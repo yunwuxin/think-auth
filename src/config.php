@@ -11,13 +11,13 @@
 
 //think-auth 配置文件
 return [
-    'provider' => [
+    'provider'                    => [
         'type'  => 'model',
         'model' => \yunwuxin\auth\model\User::class
     ],
-    'guard'    => 'session',
+    'guard'                       => 'session',
     //设为false,则不注册路由
-    'route'    => [
+    'route'                       => [
         'group'       => 'auth',
         'controllers' => [
             'login'    => \yunwuxin\auth\controller\LoginController::class,
@@ -25,5 +25,7 @@ return [
             'forgot'   => \yunwuxin\auth\controller\ForgotPasswordController::class,
             'reset'    => \yunwuxin\auth\controller\ResetPasswordController::class
         ]
-    ]
+    ],
+    'object_permission_namespace' => '\\app\\policy\\',
+    'object_permissions'          => [],
 ];

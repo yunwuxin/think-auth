@@ -23,12 +23,21 @@ use yunwuxin\auth\Request;
  */
 class Authorize
 {
+    protected function authorize($action, $object = null)
+    {
+        $user = Request::instance()->user();
+
+        if (!$user || !$user->can($action, $object)) {
+            throw new AuthorizationException;
+        }
+    }
+
     public function __call($method, $args)
     {
-        if (preg_match('/^authorize_(\w+)(?:\|(\w+))?$/', $method, $match)) {
+        if (preg_match('/^authorize_(\w+)(?:\|([\w\\]+))?$/', $method, $match)) {
 
             $action = $match[1];
-            $object = null;
+            $object = $match[2];
             if ($match[2] && isset($this->$match[2])) {
                 $object = $this->$match[2];
             }
@@ -40,11 +49,7 @@ class Authorize
                     throw new AuthorizationException;
                 }
             } else {
-                $user = Request::instance()->user();
-
-                if (!$user || !$user->can($action, $object)) {
-                    throw new AuthorizationException;
-                }
+                $this->authorize($action, $object);
             }
         } else {
             throw new \ErrorException("Call to undefined method {$method}");
