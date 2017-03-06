@@ -33,11 +33,11 @@ trait Authorize
 
     public function __call($method, $args)
     {
-        if (preg_match('/^authorize_(\w+)(?:\|([\w\\]+))?$/', $method, $match)) {
+        if (preg_match('/^authorize_(\w+)(?:\|([\w\\\]+))?$/', $method, $match)) {
 
             $ability = $match[1];
-            $object  = $match[2];
-            if ($match[2] && isset($this->$match[2])) {
+            $object  = isset($match[2]) ? $match[2] : null;
+            if (isset($match[2]) && isset($this->$match[2])) {
                 $object = $this->$match[2];
             }
 
