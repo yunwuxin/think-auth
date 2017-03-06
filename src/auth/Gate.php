@@ -11,7 +11,6 @@
 
 namespace yunwuxin\auth;
 
-use function config;
 use think\Config;
 use think\helper\Str;
 use yunwuxin\auth\traits\AuthorizableUser as User;
