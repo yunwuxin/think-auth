@@ -11,6 +11,7 @@
 
 namespace yunwuxin\auth;
 
+use function config;
 use think\Config;
 use think\helper\Str;
 use yunwuxin\auth\traits\AuthorizableUser as User;
@@ -29,7 +30,7 @@ class Gate
     public function __construct($user, $policies = [], $policyNamespace = null)
     {
         $this->user            = $user;
-        $this->policies        = $policies;
+        $this->policies        = (array) $policies;
         $this->policyNamespace = $policyNamespace;
     }
 
@@ -200,7 +201,7 @@ class Gate
     {
         $hash = spl_object_hash($user);
         if (!isset(self::$instance[$hash])) {
-            $policies              = Config::get('auth.policies', []);
+            $policies              = Config::get('auth.policies');
             $policyNamespace       = Config::get('auth.policy_namespace');
             self::$instance[$hash] = new static($user, $policies, $policyNamespace);
         }
