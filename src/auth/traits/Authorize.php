@@ -22,11 +22,11 @@ use yunwuxin\auth\Request;
  */
 trait Authorize
 {
-    protected function authorize($ability, $object = null)
+    protected function authorize($ability, ...$args)
     {
         $user = Request::instance()->user();
 
-        if (!$user || !$user->can($ability, $object)) {
+        if (!$user || !$user->can($ability, ...$args)) {
             throw new AuthorizationException;
         }
     }

@@ -33,7 +33,7 @@ trait AuthorizableUser
      */
     public function hasRole($name, $requireAll = false)
     {
-        Gate::forUser($this)->hasRole($name, $requireAll);
+        return Gate::forUser($this)->hasRole($name, $requireAll);
     }
 
     /**
@@ -42,7 +42,7 @@ trait AuthorizableUser
      */
     public function getPermissions()
     {
-        Gate::forUser($this)->getPermissions();
+        return Gate::forUser($this)->getPermissions();
     }
 
     /**
@@ -53,7 +53,7 @@ trait AuthorizableUser
      */
     public function hasPermission($name, $requireAll = false)
     {
-        Gate::forUser($this)->hasPermission($name, $requireAll);
+        return Gate::forUser($this)->hasPermission($name, $requireAll);
     }
 
     /**
@@ -64,6 +64,6 @@ trait AuthorizableUser
      */
     public function can($ability, ...$args)
     {
-        Gate::forUser($this)->can($ability, ...$args);
+        return Gate::forUser($this)->can($ability, ...$args);
     }
 }
