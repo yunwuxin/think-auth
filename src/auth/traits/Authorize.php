@@ -22,11 +22,11 @@ use yunwuxin\auth\Request;
  */
 trait Authorize
 {
-    protected function authorize($action, $object = null)
+    protected function authorize($ability, $object = null)
     {
         $user = Request::instance()->user();
 
-        if (!$user || !$user->can($action, $object)) {
+        if (!$user || !$user->can($ability, $object)) {
             throw new AuthorizationException;
         }
     }
@@ -35,20 +35,20 @@ trait Authorize
     {
         if (preg_match('/^authorize_(\w+)(?:\|([\w\\]+))?$/', $method, $match)) {
 
-            $action = $match[1];
-            $object = $match[2];
+            $ability = $match[1];
+            $object  = $match[2];
             if ($match[2] && isset($this->$match[2])) {
                 $object = $this->$match[2];
             }
 
-            $method = "authorize" . Str::studly($action);
+            $method = "authorize" . Str::studly($ability);
 
             if (method_exists($this, $method)) {
                 if (!$this->$method($object)) {
                     throw new AuthorizationException;
                 }
             } else {
-                $this->authorize($action, $object);
+                $this->authorize($ability, $object);
             }
         } else {
             throw new \ErrorException("Call to undefined method {$method}");
