@@ -17,13 +17,13 @@ use yunwuxin\auth\controller\ResetPasswordController;
 use yunwuxin\auth\model\User;
 
 return [
-    'provider'                    => [
+    'provider'         => [
         'type'  => 'model',
         'model' => User::class
     ],
-    'guard'                       => 'session',
+    'guard'            => 'session',
     //设为false,则不注册路由
-    'route'                       => [
+    'route'            => [
         'group'       => 'auth',
         'controllers' => [
             'login'    => LoginController::class,
@@ -32,6 +32,6 @@ return [
             'reset'    => ResetPasswordController::class
         ]
     ],
-    'object_permission_namespace' => '\\app\\policy\\',
-    'object_permissions'          => [],
+    'policy_namespace' => '\\app\\policy\\',
+    'policies'         => [],
 ];

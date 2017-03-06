@@ -11,9 +11,8 @@
 
 namespace yunwuxin\auth\traits;
 
-use const true;
+use yunwuxin\auth\Gate;
 use yunwuxin\auth\Role;
-use think\Config;
 
 trait AuthorizableUser
 {
@@ -34,24 +33,7 @@ trait AuthorizableUser
      */
     public function hasRole($name, $requireAll = false)
     {
-        if (is_array($name)) {
-            foreach ($name as $roleName) {
-                $hasRole = $this->hasRole($roleName);
-                if ($hasRole && !$requireAll) {
-                    return true;
-                } elseif (!$hasRole && $requireAll) {
-                    return false;
-                }
-            }
-            return $requireAll;
-        } else {
-            foreach ($this->getRoles() as $role) {
-                if ($role->getName() == $name) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        Gate::forUser($this)->hasRole($name, $requireAll);
     }
 
     /**
@@ -60,12 +42,7 @@ trait AuthorizableUser
      */
     public function getPermissions()
     {
-        $roles       = $this->getRoles();
-        $permissions = [];
-        array_map(function (Role $role) use (&$permissions) {
-            $permissions = array_merge($permissions, $role->getPermissions());
-        }, $roles);
-        return $permissions;
+        Gate::forUser($this)->getPermissions();
     }
 
     /**
@@ -76,76 +53,17 @@ trait AuthorizableUser
      */
     public function hasPermission($name, $requireAll = false)
     {
-        if (is_array($name)) {
-            foreach ($name as $permissionName) {
-                $hasPermission = $this->hasPermission($permissionName);
-                if ($hasPermission && !$requireAll) {
-                    return true;
-                } elseif (!$hasPermission && $requireAll) {
-                    return false;
-                }
-            }
-            return $requireAll;
-        } else {
-            foreach ($this->getPermissions() as $permission) {
-                //TODO 正则匹配
-                if ($permission == $name) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        Gate::forUser($this)->hasPermission($name, $requireAll);
     }
 
     /**
      * 检查权限
-     * @param      $action
-     * @param null $object
+     * @param       $ability
+     * @param array $args
      * @return bool|mixed
      */
-    public function can($action, $object = null)
+    public function can($ability, ...$args)
     {
-        $object_permissions          = Config::get('auth.object_permissions', []);
-        $object_permission_namespace = Config::get('auth.object_permission_namespace');
-        if (!is_null($object)) {
-            if (is_string($object)) {
-                //直接传入类名的情况
-                $object_class = $object;
-                $object       = null;
-            } else {
-                $object_class = get_class($object);
-            }
-            if (array_key_exists($object_class, $object_permissions)) {
-                $permission_class = $object_permissions[$object_class];
-            } elseif ($object_permission_namespace) {
-                //自动搜索
-                $permission_class = $object_permission_namespace . join('', array_slice(explode('\\', $object_class), -1)) . 'Policy';
-            } else {
-                return false;
-            }
-
-            if (!class_exists($permission_class)) {
-                return false;
-            }
-
-            $permission = new $permission_class();
-            //前置检查
-            if (method_exists($permission, 'before')) {
-                $result = call_user_func([$permission, 'before'], $this, $action, $object);
-                if (!is_null($result)) {
-                    return (boolean) $result;
-                }
-            }
-
-            if (!method_exists($permission, $action)) {
-                return false;
-            }
-
-            return call_user_func([$permission, $action], $this, $object);
-
-        } else {
-            //直接检查角色里的权限列表定义
-            return $this->hasPermission($action, true);
-        }
+        Gate::forUser($this)->can($ability, ...$args);
     }
 }
