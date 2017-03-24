@@ -26,7 +26,7 @@ trait Authorize
     {
         $user = Request::instance()->user();
 
-        if (!$user || !$user->can($ability, ...$args)) {
+        if (!can($user, $ability, ...$args)) {
             throw new AuthorizationException;
         }
     }
