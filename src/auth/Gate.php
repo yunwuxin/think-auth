@@ -121,9 +121,6 @@ class Gate
      */
     public function can($ability, ...$args)
     {
-        if (!$this->user) {
-            return false;
-        }
         if (isset($args[0])) {
             if (!is_null($policy = $this->getPolicyFor($args[0]))) {
 
@@ -198,7 +195,11 @@ class Gate
      */
     public static function forUser($user)
     {
-        $hash = spl_object_hash($user);
+        if(is_null($user)){
+            $hash = 'guest';
+        }else {
+            $hash = spl_object_hash($user);
+        }
         if (!isset(self::$instance[$hash])) {
             $policies              = Config::get('auth.policies');
             $policyNamespace       = Config::get('auth.policy_namespace');
