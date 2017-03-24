@@ -13,6 +13,7 @@ use think\Config;
 use think\helper\Hash;
 use think\Hook;
 use think\Route;
+use yunwuxin\auth\Gate;
 
 /**
  * 加密
@@ -33,22 +34,14 @@ function auth()
 }
 
 /**
- * @param      $permission
- * @param null $object
+ * @param mixed $user
+ * @param string $ability
+ * @param array $args
  * @return bool
  */
-function can($permission, $object = null)
+function can($user, $ability, ...$args)
 {
-    return true;
-}
-
-/**
- * @param $role
- * @return bool
- */
-function has_role($role)
-{
-    return true;
+    return Gate::forUser($user)->can($ability, ...$args);
 }
 
 Hook::add('app_init', function () {
