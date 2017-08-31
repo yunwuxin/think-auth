@@ -45,10 +45,10 @@ interface Authorizable
 
     /**
      * 检查权限
-     * @param      $action
-     * @param null $object
+     * @param       $action
+     * @param array $args
      * @return bool|mixed
      */
-    public function can($action, $object = null);
+    public function can($action, ...$args);
 
 }
