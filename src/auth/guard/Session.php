@@ -12,12 +12,15 @@ namespace yunwuxin\auth\guard;
 
 use think\Cookie;
 use think\helper\Str;
+use think\Response;
 use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\StatefulGuard;
+use yunwuxin\auth\interfaces\SupportsBasicAuth;
+use yunwuxin\auth\Request;
 
-class Session extends Guard implements StatefulGuard
+class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 {
 
     /**
@@ -308,6 +311,49 @@ class Session extends Guard implements StatefulGuard
         $this->loggedOut = true;
     }
 
+    public function basic($field = 'email', $extraConditions = [])
+    {
+        if ($this->check()) {
+            return;
+        }
+
+        if ($this->attemptBasic($this->getRequest(), $field, $extraConditions)) {
+            return;
+        }
+
+        return $this->failedBasicResponse();
+    }
+
+    public function onceBasic($field = 'email', $extraConditions = [])
+    {
+        $credentials = $this->basicCredentials($this->getRequest(), $field);
+
+        if (!$this->once(array_merge($credentials, $extraConditions))) {
+            return $this->failedBasicResponse();
+        }
+    }
+
+    protected function attemptBasic(Request $request, $field, $extraConditions = [])
+    {
+        if (!$request->getUser()) {
+            return false;
+        }
+
+        return $this->attempt(array_merge(
+            $this->basicCredentials($request, $field), $extraConditions
+        ));
+    }
+
+    protected function basicCredentials(Request $request, $field)
+    {
+        return [$field => $request->getUser(), 'password' => $request->getPassword()];
+    }
+
+    protected function failedBasicResponse()
+    {
+        return new Response('Invalid credentials.', 401, ['WWW-Authenticate' => 'Basic']);
+    }
+
     protected function clearUserDataFromStorage()
     {
         \think\Session::delete($this->getName());
@@ -341,5 +387,10 @@ class Session extends Guard implements StatefulGuard
     {
         $value = $user->getAuthId() . '|' . $user->getRememberToken();
         Cookie::forever($this->getRecallerName(), $value);
+    }
+
+    protected function getRequest()
+    {
+        return Request::instance();
     }
 }
