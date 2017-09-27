@@ -11,8 +11,6 @@
 
 namespace yunwuxin\auth;
 
-use think\Config;
-use think\helper\Str;
 use yunwuxin\auth\interfaces\Authenticatable;
 
 /**

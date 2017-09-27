@@ -84,7 +84,7 @@ trait Login
     {
         return [
             $this->username() => $request->param($this->username()),
-            $this->password() => $request->param($this->password())
+            $this->password() => $request->param($this->password()),
         ];
     }
 
@@ -115,10 +115,10 @@ trait Login
     {
         return Validate::make([
             $this->username() => 'require',
-            $this->password() => 'require'
+            $this->password() => 'require',
         ], [], [
             $this->username() => '用户名',
-            $this->password() => '密码'
+            $this->password() => '密码',
         ])->batch(true);
     }
 

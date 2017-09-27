@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\password;
 
-use think\Cache;
+use think\facade\Cache;
 use think\helper\Str;
 use yunwuxin\auth\interfaces\CanResetPassword;
 

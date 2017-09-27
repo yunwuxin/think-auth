@@ -11,7 +11,7 @@
 
 namespace yunwuxin\auth;
 
-use think\Config;
+use think\facade\Config;
 use think\helper\Str;
 use yunwuxin\auth\traits\AuthorizableUser as User;
 
@@ -139,8 +139,8 @@ class Gate
                 }
 
                 return is_callable([$policy, $ability])
-                    ? $policy->{$ability}($this->user, ...$args)
-                    : false;
+                ? $policy->{$ability}($this->user, ...$args)
+                : false;
             }
         }
 
@@ -195,9 +195,9 @@ class Gate
      */
     public static function forUser($user)
     {
-        if(is_null($user)){
+        if (is_null($user)) {
             $hash = 'guest';
-        }else {
+        } else {
             $hash = spl_object_hash($user);
         }
         if (!isset(self::$instance[$hash])) {

@@ -14,11 +14,11 @@
         "topthink/think-installer": ">=1.0.10,<1.1",
         "topthink/think-helper": "^1.0",
         "yunwuxin/think-custom-request": "^1.0",
-        "yunwuxin/think-notification": "^1.0",
-        "yunwuxin/think-mail": "^1.0"
+        "yunwuxin/think-notification": "^2.0",
+        "yunwuxin/think-mail": "^2.0"
     },
     "require-dev": {
-        "topthink/framework": "dev-master"
+        "topthink/framework": "5.1.x-dev"
     },
     "autoload": {
         "psr-4": {

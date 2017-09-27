@@ -10,10 +10,11 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\guard;
 
-use think\Cookie;
+use think\facade\Cookie;
+use think\facade\Session as ThinkSession;
 use think\helper\Str;
-use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\Guard;
+use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\StatefulGuard;
 
@@ -63,7 +64,7 @@ class Session extends Guard implements StatefulGuard
             return $this->user;
         }
 
-        $id = \think\Session::get($this->getName());
+        $id = ThinkSession::get($this->getName());
 
         $user = null;
 
@@ -77,7 +78,7 @@ class Session extends Guard implements StatefulGuard
             $user = $this->getUserByRecaller($recaller);
 
             if ($user) {
-                \think\Session::set($this->getName(), $user->getAuthId());
+                ThinkSession::set($this->getName(), $user->getAuthId());
             }
         }
 
@@ -95,7 +96,7 @@ class Session extends Guard implements StatefulGuard
             return null;
         }
 
-        $id = \think\Session::get($this->getName());
+        $id = ThinkSession::get($this->getName());
 
         if (is_null($id) && $this->user()) {
             $id = $this->user()->getAuthId();
@@ -229,7 +230,7 @@ class Session extends Guard implements StatefulGuard
      */
     public function login(Authenticatable $user, $remember = false)
     {
-        \think\Session::set($this->getName(), $user->getAuthId());
+        ThinkSession::set($this->getName(), $user->getAuthId());
 
         if ($remember) {
             $this->createRememberTokenIfDoesntExist($user);
@@ -310,7 +311,7 @@ class Session extends Guard implements StatefulGuard
 
     protected function clearUserDataFromStorage()
     {
-        \think\Session::delete($this->getName());
+        ThinkSession::delete($this->getName());
 
         if (!is_null($this->getRecaller())) {
             $recaller = $this->getRecallerName();

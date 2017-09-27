@@ -12,7 +12,7 @@
 namespace yunwuxin;
 
 use InvalidArgumentException;
-use think\Config;
+use think\facade\Config;
 use think\helper\Str;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\guard\Session;
@@ -52,8 +52,8 @@ class Auth
         $name = $name ?: Config::get('auth.guard');
 
         return isset($this->guards[$name])
-            ? $this->guards[$name]
-            : $this->guards[$name] = $this->buildGuard($name);
+        ? $this->guards[$name]
+        : $this->guards[$name] = $this->buildGuard($name);
     }
 
     /**

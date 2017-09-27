@@ -8,11 +8,11 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-use yunwuxin\Auth;
-use think\Config;
+use think\facade\Config;
+use think\facade\Hook;
+use think\facade\Route;
 use think\helper\Hash;
-use think\Hook;
-use think\Route;
+use yunwuxin\Auth;
 use yunwuxin\auth\Gate;
 
 /**
@@ -63,7 +63,7 @@ Hook::add('app_init', function () {
             //重设密码
             Route::get([
                 'AUTH_PASSWORD',
-                'password/reset'
+                'password/reset',
             ], "\\" . $controllers['reset'] . "@showResetForm");
             Route::post("password/reset", "\\" . $controllers['reset'] . "@reset");
         });
