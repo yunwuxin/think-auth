@@ -12,6 +12,7 @@ namespace yunwuxin\auth\guard;
 
 use think\Cookie;
 use think\helper\Str;
+use think\Hook;
 use think\Response;
 use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\Guard;
@@ -25,14 +26,12 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 上次通过认证的用户
-     *
      * @var Authenticatable
      */
     protected $lastAttempted;
 
     /**
      * 是否通过cookie记住用户
-     *
      * @var bool
      */
     protected $viaRemember = false;
@@ -53,7 +52,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 获取通过认证的用户
-     *
      * @return Authenticatable|Authorizable|null
      */
     public function user()
@@ -81,6 +79,8 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
             if ($user) {
                 \think\Session::set($this->getName(), $user->getAuthId());
+
+                Hook::listen('auth_login', $user, true);
             }
         }
 
@@ -89,7 +89,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 用户id
-     *
      * @return int|null
      */
     public function id()
@@ -109,7 +108,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 认证用户
-     *
      * @param  array $credentials
      * @return bool
      */
@@ -120,7 +118,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 设置当前用户
-     *
      * @param  Authenticatable $user
      * @return Session
      */
@@ -185,7 +182,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 尝试登录
-     *
      * @param  array $credentials
      * @param  bool  $remember
      * @param  bool  $login
@@ -208,7 +204,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 登录（当前请求有效）
-     *
      * @param  array $credentials
      * @return bool
      */
@@ -225,7 +220,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 设置登录用户
-     *
      * @param  Authenticatable $user
      * @param  bool            $remember
      * @return void
@@ -239,12 +233,13 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
             $this->createRecaller($user);
         }
 
+        Hook::listen('auth_login', $user, $remember);
+
         $this->setUser($user);
     }
 
     /**
      * 通过用户id登录
-     *
      * @param  mixed $id
      * @param  bool  $remember
      * @return false|Authenticatable
@@ -264,7 +259,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 通过用户id登录（当前请求有效）
-     *
      * @param  mixed $id
      * @return bool|Authenticatable
      */
@@ -283,7 +277,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 用户是否使用了“记住我”
-     *
      * @return bool
      */
     public function viaRemember()
@@ -293,7 +286,6 @@ class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * 登出
-     *
      * @return void
      */
     public function logout()
