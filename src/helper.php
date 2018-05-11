@@ -8,15 +8,15 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-use think\facade\Config;
 use think\facade\Hook;
 use think\facade\Route;
 use think\helper\Hash;
-use yunwuxin\Auth;
-use yunwuxin\auth\Gate;
+use yunwuxin\facade\Auth;
+use yunwuxin\facade\Gate;
 
 /**
  * 加密
+ *
  * @param $value
  * @return bool|string
  */
@@ -26,7 +26,7 @@ function encrypt($value)
 }
 
 /**
- * @return Auth
+ * @return \yunwuxin\Auth
  */
 function auth()
 {
@@ -34,9 +34,9 @@ function auth()
 }
 
 /**
- * @param mixed $user
+ * @param mixed  $user
  * @param string $ability
- * @param array $args
+ * @param array  $args
  * @return bool
  */
 function can($user, $ability, ...$args)
@@ -44,9 +44,9 @@ function can($user, $ability, ...$args)
     return Gate::forUser($user)->can($ability, ...$args);
 }
 
-Hook::add('app_init', function () {
+Hook::add('app_init', function (\think\Config $config) {
     //注册路由
-    $route = Config::get('auth.route');
+    $route = $config->get('auth.route');
     if ($route) {
         $controllers = $route['controllers'];
         Route::group($route['group'], function () use ($controllers) {

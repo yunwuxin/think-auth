@@ -8,22 +8,47 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-namespace yunwuxin\auth\behavior;
+namespace yunwuxin\auth\middleware;
 
+use Closure;
+use yunwuxin\Auth;
 use yunwuxin\auth\exception\AuthenticationException;
 
 /**
  * 用户身份认证
  * Class Authentication
+ *
  * @package think\auth\behavior
  */
 class Authentication
 {
-    public function run()
+
+    protected $auth;
+
+    public function __construct(Auth $auth)
     {
-        if (!auth()->check()) {
-            throw new AuthenticationException;
+        $this->auth = $auth;
+    }
+
+    public function handle($request, Closure $next, ...$guards)
+    {
+        $this->authenticate($guards);
+
+        return $next($request);
+    }
+
+    protected function authenticate(array $guards)
+    {
+        if (empty($guards)) {
+            return $this->auth->authenticate();
         }
 
+        foreach ($guards as $guard) {
+            if ($this->auth->guard($guard)->check()) {
+                return $this->auth->shouldUse($guard);
+            }
+        }
+
+        throw new AuthenticationException();
     }
 }

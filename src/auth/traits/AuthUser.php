@@ -11,10 +11,13 @@
 
 namespace yunwuxin\auth\traits;
 
-use yunwuxin\Auth;
+use yunwuxin\facade\Auth;
 
 trait AuthUser
 {
+    /**
+     * @return \yunwuxin\Auth
+     */
     public function auth()
     {
         return Auth::instance();

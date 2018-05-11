@@ -15,7 +15,6 @@ use think\exception\ValidateException;
 use think\Request;
 use think\Response;
 use think\Validate;
-use yunwuxin\auth\model\User;
 
 trait Login
 {

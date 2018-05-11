@@ -11,7 +11,7 @@
 
 namespace yunwuxin\auth;
 
-use think\facade\Config;
+use think\Config;
 use think\helper\Str;
 use yunwuxin\auth\traits\AuthorizableUser as User;
 
@@ -26,15 +26,21 @@ class Gate
 
     protected static $instance = [];
 
-    public function __construct($user, $policies = [], $policyNamespace = null)
+    public function __construct($policies = [], $policyNamespace = null)
     {
-        $this->user            = $user;
         $this->policies        = (array) $policies;
         $this->policyNamespace = $policyNamespace;
     }
 
+    public function setUser($user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+
     /**
      * 是否具有某个角色
+     *
      * @param array|string $name
      * @param bool         $requireAll
      * @return bool
@@ -66,6 +72,7 @@ class Gate
 
     /**
      * 获取用户的所有权限
+     *
      * @return array
      */
     public function getPermissions()
@@ -83,6 +90,7 @@ class Gate
 
     /**
      * 是否具有某个权限
+     *
      * @param      $name
      * @param bool $requireAll
      * @return bool
@@ -115,6 +123,7 @@ class Gate
 
     /**
      * 检查权限
+     *
      * @param       $ability
      * @param array $args
      * @return bool|mixed
@@ -139,8 +148,8 @@ class Gate
                 }
 
                 return is_callable([$policy, $ability])
-                ? $policy->{$ability}($this->user, ...$args)
-                : false;
+                    ? $policy->{$ability}($this->user, ...$args)
+                    : false;
             }
         }
 
@@ -193,19 +202,18 @@ class Gate
      * @param $user
      * @return static
      */
-    public static function forUser($user)
+    public function forUser($user)
     {
-        if (is_null($user)) {
-            $hash = 'guest';
-        } else {
-            $hash = spl_object_hash($user);
-        }
-        if (!isset(self::$instance[$hash])) {
-            $policies              = Config::get('auth.policies');
-            $policyNamespace       = Config::get('auth.policy_namespace');
-            self::$instance[$hash] = new static($user, $policies, $policyNamespace);
-        }
-
-        return self::$instance[$hash];
+        return (new static($this->policies, $this->policyNamespace))->setUser($user);
     }
+
+
+    public static function __make(Config $config)
+    {
+        $policies        = $config->get('auth.policies');
+        $policyNamespace = $config->get('auth.policy_namespace');
+
+        return new self($policies, $policyNamespace);
+    }
+
 }

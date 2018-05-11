@@ -25,12 +25,12 @@ trait SendPasswordResetEmail
         return view('auth/password/email');
     }
 
-    public function sendResetLinkEmail(Request $request)
+    public function sendResetLinkEmail(Request $request, Broker $broker)
     {
         $this->validate($request);
 
         try {
-            $this->broker()->sendResetLink($request->only('email'));
+            $broker->sendResetLink($request->only('email'));
         } catch (Exception $e) {
             throw new ValidateException(['email' => $this->getExceptionMessage($e->getMessage())]);
         }
@@ -42,6 +42,7 @@ trait SendPasswordResetEmail
 
     /**
      * 发送后的跳转地址
+     *
      * @return string
      */
     protected function redirectPath()
@@ -78,13 +79,9 @@ trait SendPasswordResetEmail
         }
     }
 
-    protected function broker()
-    {
-        return new Broker();
-    }
-
     /**
      * 生成验证器
+     *
      * @param Request $request
      * @return Validate
      */

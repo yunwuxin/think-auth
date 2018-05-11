@@ -11,13 +11,14 @@
 
 namespace yunwuxin\auth\traits;
 
-use yunwuxin\auth\Gate;
+use yunwuxin\facade\Gate;
 use yunwuxin\auth\Role;
 
 trait AuthorizableUser
 {
     /**
      * 获取用户角色
+     *
      * @return Role[]
      */
     public function getRoles()
@@ -27,6 +28,7 @@ trait AuthorizableUser
 
     /**
      * 是否具有某个角色
+     *
      * @param array|string $name
      * @param bool         $requireAll
      * @return bool
@@ -38,6 +40,7 @@ trait AuthorizableUser
 
     /**
      * 获取用户的所有权限
+     *
      * @return array
      */
     public function getPermissions()
@@ -47,6 +50,7 @@ trait AuthorizableUser
 
     /**
      * 是否具有某个权限
+     *
      * @param      $name
      * @param bool $requireAll
      * @return bool
@@ -58,6 +62,7 @@ trait AuthorizableUser
 
     /**
      * 检查权限
+     *
      * @param       $ability
      * @param array $args
      * @return bool|mixed

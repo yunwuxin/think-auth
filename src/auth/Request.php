@@ -11,10 +11,9 @@
 
 namespace yunwuxin\auth;
 
-use think\BaseRequest;
 use yunwuxin\auth\traits\AuthUser;
 
-class Request extends BaseRequest
+class Request extends \think\Request
 {
     use AuthUser;
 

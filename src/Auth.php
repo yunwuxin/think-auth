@@ -12,6 +12,7 @@
 namespace yunwuxin;
 
 use InvalidArgumentException;
+use think\App;
 use think\Config;
 use think\helper\Str;
 use yunwuxin\auth\Guard;
@@ -22,33 +23,31 @@ use yunwuxin\auth\Provider;
 
 /**
  * Class Auth
- * @package yunwuxin
  *
+ * @package yunwuxin
  * @mixin Session
  * @mixin Token
  */
 class Auth
 {
-    private static $instance;
 
     /** @var Guard[] */
     protected $guards = [];
 
-    /**
-     * 获取实例
-     * @return Auth
-     */
-    public static function instance()
+    protected $config;
+
+    /** @var App */
+    protected $app;
+
+    public function __construct($config, $app)
     {
-        if (!(self::$instance instanceof self)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+        $this->config = $config;
+        $this->app    = $app;
     }
 
     public function shouldUse($name)
     {
-        Config::set('auth.guard', $name);
+        $this->config['guard'] = $name;
         return $this;
     }
 
@@ -59,11 +58,11 @@ class Auth
 
     /**
      * @param null $name
-     * @return mixed|Guard|StatefulGuard
+     * @return mixed|Guard|StatefulGuard|Session|Token
      */
     public function guard($name = null)
     {
-        $name = $name ?: Config::get('auth.guard');
+        $name = $name ?: $this->config['guard'];
 
         return isset($this->guards[$name])
             ? $this->guards[$name]
@@ -74,10 +73,11 @@ class Auth
     {
         $className = false !== strpos($name, '\\') ? $name : "\\yunwuxin\\auth\\guard\\" . Str::studly($name);
         if (class_exists($className)) {
-            return new $className($this->buildProvider());
+            return $this->app->container()->make($className, [$this->buildProvider()]);
         }
         throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
     }
+
 
     /**
      * @param null $provider
@@ -85,7 +85,7 @@ class Auth
      */
     public function buildProvider($provider = null)
     {
-        $config = Config::get('auth.provider');
+        $config = $this->config['provider'];
 
         $provider = $provider ?: $config['type'];
 
@@ -98,4 +98,9 @@ class Auth
         throw new InvalidArgumentException("Authentication user provider [{$config['type']}] is not defined.");
     }
 
+
+    public static function __make(Config $config, App $app)
+    {
+        return new self($config->get('auth'), $app);
+    }
 }

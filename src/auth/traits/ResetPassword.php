@@ -30,12 +30,12 @@ trait ResetPassword
         ]);
     }
 
-    public function reset(Request $request)
+    public function reset(Request $request, Broker $broker)
     {
         $this->validate($request);
 
         try {
-            $this->broker()->reset(
+            $broker->reset(
                 $this->credentials($request), function ($user, $password) {
                 $this->resetPassword($user, $password);
             });
@@ -59,6 +59,7 @@ trait ResetPassword
 
     /**
      * 生成验证器
+     *
      * @param Request $request
      * @return Validate
      */
@@ -69,11 +70,6 @@ trait ResetPassword
             'email'    => 'require|email',
             'password' => 'require|confirm:password_confirm|min:6',
         ])->batch(true);
-    }
-
-    protected function broker()
-    {
-        return new Broker();
     }
 
     protected function credentials(Request $request)
@@ -124,6 +120,7 @@ trait ResetPassword
 
     /**
      * 发送后的跳转地址
+     *
      * @return string
      */
     protected function redirectPath()

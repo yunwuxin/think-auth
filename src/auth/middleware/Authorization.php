@@ -9,7 +9,7 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-namespace yunwuxin\auth\behavior;
+namespace yunwuxin\auth\middleware;
 
 use yunwuxin\auth\exception\AuthorizationException;
 use yunwuxin\auth\interfaces\Authenticatable;

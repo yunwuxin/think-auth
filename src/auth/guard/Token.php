@@ -11,20 +11,23 @@
 namespace yunwuxin\auth\guard;
 
 use think\helper\Str;
-use think\Request;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\Provider;
+use yunwuxin\auth\Request;
+use yunwuxin\auth\traits\GuardHelpers;
 
-class Token extends Guard
+class Token implements Guard
 {
 
-    /**
-     * 是否通过认证
-     * @return mixed
-     */
-    public function check()
+    use GuardHelpers;
+
+    protected $request;
+
+    public function __construct(Provider $provider, Request $request)
     {
-        return !is_null($this->user());
+        $this->provider = $provider;
+        $this->request  = $request;
     }
 
     /**
@@ -53,10 +56,9 @@ class Token extends Guard
 
     protected function getTokenFromRequest()
     {
-        $request = Request::instance();
-        $token   = $request->param('access-token');
+        $token = $this->request->param('access-token');
         if (empty($token)) {
-            $header = $request->header('Authorization');
+            $header = $this->request->header('Authorization');
             if (Str::startsWith($header, 'Bearer ')) {
                 $token = Str::substr($header, 7);
             }
@@ -65,17 +67,6 @@ class Token extends Guard
         return $token;
     }
 
-    /**
-     * 用户id
-     *
-     * @return int|null
-     */
-    public function id()
-    {
-        if ($this->user()) {
-            return $this->user()->getAuthId();
-        }
-    }
 
     /**
      * 认证用户
@@ -98,16 +89,4 @@ class Token extends Guard
         return false;
     }
 
-    /**
-     * 设置当前用户
-     *
-     * @param  Authenticatable $user
-     * @return $this
-     */
-    public function setUser(Authenticatable $user)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
 }

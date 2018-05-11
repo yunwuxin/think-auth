@@ -30,8 +30,18 @@ class Broker
      */
     protected $passwordValidator;
 
+    /** @var Token */
+    protected $token;
+
+
+    public function __construct(Token $token)
+    {
+        $this->token = $token;
+    }
+
     /**
      * 发送重置密码链接
+     *
      * @param array $credentials
      * @return string
      */
@@ -46,6 +56,7 @@ class Broker
 
     /**
      * 重置密码
+     *
      * @param array   $credentials
      * @param Closure $callback
      * @return string
@@ -58,12 +69,12 @@ class Broker
 
         $callback($user, $pass);
 
-        Token::delete($user);
+        $this->token->delete($user);
     }
 
     protected function createToken(CanResetPassword $user)
     {
-        return Token::create($user);
+        return $this->token->create($user);
     }
 
     protected function validateReset(array $credentials)
@@ -76,7 +87,7 @@ class Broker
             throw new Exception(Exception::INVALID_PASSWORD);
         }
 
-        if (!Token::exists($user, $credentials['token'])) {
+        if (!$this->token->exists($user, $credentials['token'])) {
             throw new Exception(Exception::INVALID_TOKEN);
         }
 
@@ -135,7 +146,7 @@ class Broker
     public function tokenExists(array $credentials, $token)
     {
         if (!is_null($user = $this->getUser($credentials))) {
-            return Token::exists($user, $token);
+            return $this->token->exists($user, $token);
         }
 
         return false;
