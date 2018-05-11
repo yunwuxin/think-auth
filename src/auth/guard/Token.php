@@ -10,6 +10,8 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\guard;
 
+use think\helper\Str;
+use think\Request;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\interfaces\Authenticatable;
 
@@ -22,7 +24,7 @@ class Token extends Guard
      */
     public function check()
     {
-        // TODO: Implement check() method.
+        return !is_null($this->user());
     }
 
     /**
@@ -32,7 +34,35 @@ class Token extends Guard
      */
     public function user()
     {
-        // TODO: Implement user() method.
+        if (!is_null($this->user)) {
+            return $this->user;
+        }
+
+        $user = null;
+
+        $token = $this->getTokenFromRequest();
+
+        if (!empty($token)) {
+            $user = $this->provider->retrieveByCredentials(
+                ['token' => $token]
+            );
+        }
+
+        return $this->user = $user;
+    }
+
+    protected function getTokenFromRequest()
+    {
+        $request = Request::instance();
+        $token   = $request->param('access-token');
+        if (empty($token)) {
+            $header = $request->header('Authorization');
+            if (Str::startsWith($header, 'Bearer ')) {
+                $token = Str::substr($header, 7);
+            }
+        }
+
+        return $token;
     }
 
     /**
@@ -42,7 +72,9 @@ class Token extends Guard
      */
     public function id()
     {
-        // TODO: Implement id() method.
+        if ($this->user()) {
+            return $this->user()->getAuthId();
+        }
     }
 
     /**
@@ -53,17 +85,29 @@ class Token extends Guard
      */
     public function validate(array $credentials = [])
     {
-        // TODO: Implement validate() method.
+        if (empty($credentials['token'])) {
+            return false;
+        }
+
+        $credentials = ['token' => $credentials['token']];
+
+        if ($this->provider->retrieveByCredentials($credentials)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * 设置当前用户
      *
      * @param  Authenticatable $user
-     * @return void
+     * @return $this
      */
     public function setUser(Authenticatable $user)
     {
-        // TODO: Implement setUser() method.
+        $this->user = $user;
+
+        return $this;
     }
 }

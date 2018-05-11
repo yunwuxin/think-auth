@@ -10,11 +10,12 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\notification;
 
+use think\queue\ShouldQueue;
 use yunwuxin\Notification;
 use yunwuxin\notification\message\Mail;
 use yunwuxin\notification\Notifiable;
 
-class ResetPassword extends Notification
+class ResetPassword extends Notification implements ShouldQueue
 {
 
     public $token;

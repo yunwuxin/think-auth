@@ -26,7 +26,7 @@ trait Authorize
     {
         $user = Request::instance()->user();
 
-        if (!$user || !$user->can($ability, ...$args)) {
+        if (!can($user, $ability, ...$args)) {
             throw new AuthorizationException;
         }
     }
@@ -37,8 +37,8 @@ trait Authorize
 
             $ability = $match[1];
             $object  = isset($match[2]) ? $match[2] : null;
-            if (isset($match[2]) && isset($this->$match[2])) {
-                $object = $this->$match[2];
+            if (isset($match[2]) && isset($this->{$match[2]})) {
+                $object = $this->{$match[2]};
             }
 
             $method = "authorize" . Str::studly($ability);

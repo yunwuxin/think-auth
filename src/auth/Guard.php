@@ -58,7 +58,7 @@ abstract class Guard
      * 设置当前用户
      *
      * @param  Authenticatable $user
-     * @return void
+     * @return $this
      */
     abstract public function setUser(Authenticatable $user);
 }

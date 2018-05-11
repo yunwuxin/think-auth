@@ -10,27 +10,28 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\guard;
 
-use think\facade\Cookie;
-use think\facade\Session as ThinkSession;
+use think\Cookie;
 use think\helper\Str;
-use yunwuxin\auth\Guard;
+use think\Hook;
+use think\Response;
 use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\Guard;
 use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\StatefulGuard;
+use yunwuxin\auth\interfaces\SupportsBasicAuth;
+use yunwuxin\auth\Request;
 
-class Session extends Guard implements StatefulGuard
+class Session extends Guard implements StatefulGuard, SupportsBasicAuth
 {
 
     /**
      * 上次通过认证的用户
-     *
      * @var Authenticatable
      */
     protected $lastAttempted;
 
     /**
      * 是否通过cookie记住用户
-     *
      * @var bool
      */
     protected $viaRemember = false;
@@ -51,7 +52,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 获取通过认证的用户
-     *
      * @return Authenticatable|Authorizable|null
      */
     public function user()
@@ -64,7 +64,7 @@ class Session extends Guard implements StatefulGuard
             return $this->user;
         }
 
-        $id = ThinkSession::get($this->getName());
+        $id = \think\Session::get($this->getName());
 
         $user = null;
 
@@ -78,7 +78,9 @@ class Session extends Guard implements StatefulGuard
             $user = $this->getUserByRecaller($recaller);
 
             if ($user) {
-                ThinkSession::set($this->getName(), $user->getAuthId());
+                \think\Session::set($this->getName(), $user->getAuthId());
+
+                Hook::listen('auth_login', $user, true);
             }
         }
 
@@ -87,7 +89,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 用户id
-     *
      * @return int|null
      */
     public function id()
@@ -96,7 +97,7 @@ class Session extends Guard implements StatefulGuard
             return null;
         }
 
-        $id = ThinkSession::get($this->getName());
+        $id = \think\Session::get($this->getName());
 
         if (is_null($id) && $this->user()) {
             $id = $this->user()->getAuthId();
@@ -107,7 +108,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 认证用户
-     *
      * @param  array $credentials
      * @return bool
      */
@@ -118,7 +118,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 设置当前用户
-     *
      * @param  Authenticatable $user
      * @return Session
      */
@@ -183,7 +182,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 尝试登录
-     *
      * @param  array $credentials
      * @param  bool  $remember
      * @param  bool  $login
@@ -206,7 +204,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 登录（当前请求有效）
-     *
      * @param  array $credentials
      * @return bool
      */
@@ -223,26 +220,26 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 设置登录用户
-     *
      * @param  Authenticatable $user
      * @param  bool            $remember
      * @return void
      */
     public function login(Authenticatable $user, $remember = false)
     {
-        ThinkSession::set($this->getName(), $user->getAuthId());
+        \think\Session::set($this->getName(), $user->getAuthId());
 
         if ($remember) {
             $this->createRememberTokenIfDoesntExist($user);
             $this->createRecaller($user);
         }
 
+        Hook::listen('auth_login', $user, $remember);
+
         $this->setUser($user);
     }
 
     /**
      * 通过用户id登录
-     *
      * @param  mixed $id
      * @param  bool  $remember
      * @return false|Authenticatable
@@ -262,7 +259,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 通过用户id登录（当前请求有效）
-     *
      * @param  mixed $id
      * @return bool|Authenticatable
      */
@@ -281,7 +277,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 用户是否使用了“记住我”
-     *
      * @return bool
      */
     public function viaRemember()
@@ -291,7 +286,6 @@ class Session extends Guard implements StatefulGuard
 
     /**
      * 登出
-     *
      * @return void
      */
     public function logout()
@@ -309,9 +303,52 @@ class Session extends Guard implements StatefulGuard
         $this->loggedOut = true;
     }
 
+    public function basic($field = 'email', $extraConditions = [])
+    {
+        if ($this->check()) {
+            return;
+        }
+
+        if ($this->attemptBasic($this->getRequest(), $field, $extraConditions)) {
+            return;
+        }
+
+        return $this->failedBasicResponse();
+    }
+
+    public function onceBasic($field = 'email', $extraConditions = [])
+    {
+        $credentials = $this->basicCredentials($this->getRequest(), $field);
+
+        if (!$this->once(array_merge($credentials, $extraConditions))) {
+            return $this->failedBasicResponse();
+        }
+    }
+
+    protected function attemptBasic(Request $request, $field, $extraConditions = [])
+    {
+        if (!$request->getUser()) {
+            return false;
+        }
+
+        return $this->attempt(array_merge(
+            $this->basicCredentials($request, $field), $extraConditions
+        ));
+    }
+
+    protected function basicCredentials(Request $request, $field)
+    {
+        return [$field => $request->getUser(), 'password' => $request->getPassword()];
+    }
+
+    protected function failedBasicResponse()
+    {
+        return new Response('Invalid credentials.', 401, ['WWW-Authenticate' => 'Basic']);
+    }
+
     protected function clearUserDataFromStorage()
     {
-        ThinkSession::delete($this->getName());
+        \think\Session::delete($this->getName());
 
         if (!is_null($this->getRecaller())) {
             $recaller = $this->getRecallerName();
@@ -342,5 +379,10 @@ class Session extends Guard implements StatefulGuard
     {
         $value = $user->getAuthId() . '|' . $user->getRememberToken();
         Cookie::forever($this->getRecallerName(), $value);
+    }
+
+    protected function getRequest()
+    {
+        return Request::instance();
     }
 }

@@ -12,7 +12,7 @@
 namespace yunwuxin;
 
 use InvalidArgumentException;
-use think\facade\Config;
+use think\Config;
 use think\helper\Str;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\guard\Session;
@@ -34,13 +34,27 @@ class Auth
     /** @var Guard[] */
     protected $guards = [];
 
-    protected function buildGuard($name)
+    /**
+     * 获取实例
+     * @return Auth
+     */
+    public static function instance()
     {
-        $className = false !== strpos($name, '\\') ? $name : "\\yunwuxin\\auth\\guard\\" . Str::studly($name);
-        if (class_exists($className)) {
-            return new $className($this->buildProvider());
+        if (!(self::$instance instanceof self)) {
+            self::$instance = new self();
         }
-        throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
+        return self::$instance;
+    }
+
+    public function shouldUse($name)
+    {
+        Config::set('auth.guard', $name);
+        return $this;
+    }
+
+    public function __call($method, $parameters)
+    {
+        return call_user_func_array([$this->guard(), $method], $parameters);
     }
 
     /**
@@ -52,8 +66,17 @@ class Auth
         $name = $name ?: Config::get('auth.guard');
 
         return isset($this->guards[$name])
-        ? $this->guards[$name]
-        : $this->guards[$name] = $this->buildGuard($name);
+            ? $this->guards[$name]
+            : $this->guards[$name] = $this->buildGuard($name);
+    }
+
+    protected function buildGuard($name)
+    {
+        $className = false !== strpos($name, '\\') ? $name : "\\yunwuxin\\auth\\guard\\" . Str::studly($name);
+        if (class_exists($className)) {
+            return new $className($this->buildProvider());
+        }
+        throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
     }
 
     /**
@@ -73,23 +96,6 @@ class Auth
         }
 
         throw new InvalidArgumentException("Authentication user provider [{$config['type']}] is not defined.");
-    }
-
-    /**
-     * 获取实例
-     * @return Auth
-     */
-    public static function instance()
-    {
-        if (!(self::$instance instanceof self)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    public function __call($method, $parameters)
-    {
-        return call_user_func_array([$this->guard(), $method], $parameters);
     }
 
 }

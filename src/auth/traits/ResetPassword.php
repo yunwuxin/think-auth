@@ -25,7 +25,7 @@ trait ResetPassword
 {
     public function showResetForm(Request $request, $token, $email)
     {
-        return view('auth.passwords.reset', [
+        return view('auth/password/reset', [
             ['token' => $token, 'email' => $email]
         ]);
     }
@@ -46,56 +46,6 @@ trait ResetPassword
         return $this->reseted()
             ?: redirect($this->redirectPath());
 
-    }
-
-    /**
-     * 发送后的跳转地址
-     * @return string
-     */
-    protected function redirectPath()
-    {
-        return '/';
-    }
-
-    /**
-     * @return Response
-     */
-    protected function reseted()
-    {
-
-    }
-
-    protected function getExceptionMessage($message)
-    {
-        switch ($message) {
-            case Exception::INVALID_USER:
-                return '用户不存在';
-            case Exception::INVALID_TOKEN:
-                return '令牌错误或已过期';
-            case Exception::INVALID_PASSWORD:
-                return '两次输入的密码不一样';
-        }
-    }
-
-    /**
-     * @param Model|Authenticatable $user
-     * @param                       $password
-     */
-    protected function resetPassword($user, $password)
-    {
-        $user->save([
-            'password'       => encrypt($password),
-            'remember_token' => Str::random(60),
-        ]);
-
-        $this->guard()->login($user);
-    }
-
-    protected function credentials(Request $request)
-    {
-        return $request->only(
-            ['email', 'password', 'password_confirm', 'token']
-        );
     }
 
     protected function validate(Request $request)
@@ -121,13 +71,63 @@ trait ResetPassword
         ])->batch(true);
     }
 
+    protected function broker()
+    {
+        return new Broker();
+    }
+
+    protected function credentials(Request $request)
+    {
+        return $request->only(
+            ['email', 'password', 'password_confirm', 'token']
+        );
+    }
+
+    /**
+     * @param Model|Authenticatable $user
+     * @param                       $password
+     */
+    protected function resetPassword($user, $password)
+    {
+        $user->save([
+            'password'       => encrypt($password),
+            'remember_token' => Str::random(60),
+        ]);
+
+        $this->guard()->login($user);
+    }
+
     protected function guard()
     {
         return auth()->guard();
     }
 
-    protected function broker()
+    protected function getExceptionMessage($message)
     {
-        return new Broker();
+        switch ($message) {
+            case Exception::INVALID_USER:
+                return '用户不存在';
+            case Exception::INVALID_TOKEN:
+                return '令牌错误或已过期';
+            case Exception::INVALID_PASSWORD:
+                return '两次输入的密码不一样';
+        }
+    }
+
+    /**
+     * @return Response
+     */
+    protected function reseted()
+    {
+
+    }
+
+    /**
+     * 发送后的跳转地址
+     * @return string
+     */
+    protected function redirectPath()
+    {
+        return '/';
     }
 }
