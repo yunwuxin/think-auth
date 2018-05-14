@@ -15,11 +15,13 @@ use think\exception\ValidateException;
 use think\Request;
 use think\Response;
 use think\Validate;
+use yunwuxin\facade\Auth;
 
 trait Login
 {
     /**
      * 登录
+     *
      * @param Request $request
      * @return Response
      */
@@ -28,7 +30,7 @@ trait Login
         $this->validate($request);
 
         if ($this->attempt($request)) {
-            return $this->logined(auth()->user()) ?: redirect($this->redirectPath())->restore();
+            return $this->logined($this->guard()->user()) ?: redirect($this->redirectPath())->restore();
         }
 
         throw new ValidateException([$this->username() => '用户名或密码错误']);
@@ -36,10 +38,12 @@ trait Login
 
     /**
      * 登录页面
+     *
+     * @return \think\response\Redirect|\think\response\View
      */
     public function showLoginForm()
     {
-        if (auth()->user()) {
+        if ($this->guard()->user()) {
             return redirect($this->redirectPath());
         }
         return view('auth/login');
@@ -47,17 +51,19 @@ trait Login
 
     /**
      * 登出
+     *
      * @return \think\response\Redirect
      */
     public function logout()
     {
-        auth()->logout();
+        $this->guard()->logout();
 
         return redirect('/');
     }
 
     /**
      * 获取用户名字段名
+     *
      * @return string
      */
     protected function username()
@@ -67,6 +73,7 @@ trait Login
 
     /**
      * 获取密码字段名
+     *
      * @return string
      */
     protected function password()
@@ -76,6 +83,7 @@ trait Login
 
     /**
      * 认证信息
+     *
      * @param Request $request
      * @return array
      */
@@ -98,6 +106,7 @@ trait Login
 
     /**
      * 登录成功后的跳转地址
+     *
      * @return string
      */
     protected function redirectPath()
@@ -107,6 +116,7 @@ trait Login
 
     /**
      * 生成验证器
+     *
      * @param Request $request
      * @return Validate
      */
@@ -123,6 +133,7 @@ trait Login
 
     /**
      * 验证
+     *
      * @param Request $request
      */
     protected function validate(Request $request)
@@ -136,12 +147,17 @@ trait Login
 
     /**
      * 登录验证
+     *
      * @param Request $request
      * @return bool
      */
     protected function attempt(Request $request)
     {
-        return auth()->attempt($this->credentials($request), $request->has('remember'));
+        return $this->guard()->attempt($this->credentials($request), $request->has('remember'));
     }
 
+    protected function guard()
+    {
+        return Auth::guard();
+    }
 }

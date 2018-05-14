@@ -11,6 +11,9 @@
 
 namespace yunwuxin\auth\middleware;
 
+use Closure;
+use think\Request;
+use yunwuxin\Auth;
 use yunwuxin\auth\exception\AuthorizationException;
 use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\interfaces\Authorizable;
@@ -18,17 +21,31 @@ use yunwuxin\auth\interfaces\Authorizable;
 /**
  * 权限管理
  * Class Authorization
+ *
  * @package think\auth\behavior
  */
 class Authorization
 {
-    public function run()
+
+    protected $auth;
+
+    public function __construct(Auth $auth)
+    {
+        $this->auth = $auth;
+    }
+
+    /**
+     * @param Request $request
+     * @param Closure $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
     {
 
         /** @var Authenticatable|Authorizable $user */
-        $user = auth()->user();
+        $user = $this->auth->user();
 
-        $routeInfo = request()->routeInfo();
+        $routeInfo = $request->routeInfo();
 
         if (isset($routeInfo['option']['roles'])) {
             if (!$user->hasRole($routeInfo['option']['roles'])) {
@@ -50,10 +67,13 @@ class Authorization
                 throw new AuthorizationException;
             }
         }
+
+        return $next($request);
     }
 
     /**
      * 是否为关联数组
+     *
      * @param array $arr
      * @return bool
      */

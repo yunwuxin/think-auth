@@ -16,6 +16,7 @@ use UnexpectedValueException;
 use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\interfaces\CanResetPassword;
 use yunwuxin\auth\Provider;
+use yunwuxin\facade\Auth;
 
 class Broker
 {
@@ -134,7 +135,7 @@ class Broker
             unset($credentials['token']);
         }
 
-        $user = auth()->buildProvider()->retrieveByCredentials($credentials);
+        $user = Auth::buildProvider()->retrieveByCredentials($credentials);
 
         if ($user && !$user instanceof CanResetPassword) {
             throw new UnexpectedValueException('User must implement CanResetPassword interface.');

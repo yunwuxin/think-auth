@@ -16,17 +16,19 @@ use think\exception\ValidateException;
 use think\Request;
 use think\Response;
 use think\Validate;
+use yunwuxin\facade\Auth;
 
 trait Register
 {
 
     /**
      * 注册页面
+     *
      * @return \think\response\View
      */
     public function showRegisterForm()
     {
-        if (auth()->user()) {
+        if ($this->guard()->user()) {
             return redirect($this->redirectPath());
         }
 
@@ -37,13 +39,14 @@ trait Register
     {
         $this->validate($request);
         $user = $this->create($request);
-        auth()->login($user);
+        $this->guard()->login($user);
         return $this->registered($user)
             ?: redirect($this->redirectPath());
     }
 
     /**
      * 注册成功后的跳转地址
+     *
      * @return string
      */
     protected function redirectPath()
@@ -52,7 +55,6 @@ trait Register
     }
 
     /**
-     *
      * @param Authenticatable $user
      * @return Response
      */
@@ -72,6 +74,7 @@ trait Register
 
     /**
      * 生成验证器
+     *
      * @param Request $request
      * @return Validate
      */
@@ -82,6 +85,7 @@ trait Register
 
     /**
      * 验证
+     *
      * @param Request $request
      */
     protected function validate(Request $request)
@@ -91,5 +95,10 @@ trait Register
         if (!$validator->check($request->param())) {
             throw new ValidateException($validator->getError());
         }
+    }
+
+    protected function guard()
+    {
+        return Auth::guard();
     }
 }

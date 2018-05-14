@@ -20,6 +20,7 @@ use think\Validate;
 use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\password\Broker;
 use yunwuxin\auth\password\Exception;
+use yunwuxin\facade\Auth;
 
 trait ResetPassword
 {
@@ -95,7 +96,7 @@ trait ResetPassword
 
     protected function guard()
     {
-        return auth()->guard();
+        return Auth::guard();
     }
 
     protected function getExceptionMessage($message)

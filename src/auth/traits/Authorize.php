@@ -13,18 +13,19 @@ namespace yunwuxin\auth\traits;
 
 use think\helper\Str;
 use yunwuxin\auth\exception\AuthorizationException;
-use yunwuxin\auth\Request;
+use yunwuxin\facade\Auth;
 
 /**
  * 控制器鉴权
  * Class Authorize
+ *
  * @package yunwuxin\auth\traits
  */
 trait Authorize
 {
     protected function authorize($ability, ...$args)
     {
-        $user = Request::instance()->user();
+        $user = Auth::user();
 
         if (!can($user, $ability, ...$args)) {
             throw new AuthorizationException;
