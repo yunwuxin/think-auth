@@ -15,16 +15,9 @@ use yunwuxin\facade\Auth;
 
 trait AuthUser
 {
-    /**
-     * @return \yunwuxin\Auth
-     */
-    public function auth()
-    {
-        return Auth::instance();
-    }
 
     public function user()
     {
-        return $this->auth()->user();
+        return Auth::user();
     }
 }

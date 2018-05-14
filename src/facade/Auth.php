@@ -11,6 +11,12 @@ namespace yunwuxin\facade;
 
 use think\Facade;
 
+/**
+ * Class Auth
+ *
+ * @package yunwuxin\facade
+ * @mixin \yunwuxin\Auth
+ */
 class Auth extends Facade
 {
     protected static function getFacadeClass()

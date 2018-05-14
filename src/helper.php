@@ -11,7 +11,6 @@
 use think\facade\Hook;
 use think\facade\Route;
 use think\helper\Hash;
-use yunwuxin\facade\Auth;
 use yunwuxin\facade\Gate;
 
 /**
@@ -23,14 +22,6 @@ use yunwuxin\facade\Gate;
 function encrypt($value)
 {
     return Hash::make($value);
-}
-
-/**
- * @return \yunwuxin\Auth
- */
-function auth()
-{
-    return Auth::instance();
 }
 
 /**
