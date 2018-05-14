@@ -82,10 +82,6 @@ class Auth
     }
 
 
-    /**
-     * @param null $provider
-     * @return Provider
-     */
     public function buildProvider($provider = null)
     {
         $config = $this->config['provider'];
@@ -95,7 +91,7 @@ class Auth
         $className = false !== strpos($provider, '\\') ? $provider : "\\yunwuxin\\auth\\provider\\" . Str::studly($provider);
 
         if (class_exists($className)) {
-            return new $className($config);
+            return $this->app->container()->make($className, [$config]);
         }
 
         throw new InvalidArgumentException("Authentication user provider [{$config['type']}] is not defined.");
