@@ -76,7 +76,7 @@ class Auth
     {
         $className = false !== strpos($name, '\\') ? $name : "\\yunwuxin\\auth\\guard\\" . Str::studly($name);
         if (class_exists($className)) {
-            return $this->app->container()->make($className, [$this->buildProvider()]);
+            return $this->app->make($className, [$this->buildProvider()]);
         }
         throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
     }
@@ -91,7 +91,7 @@ class Auth
         $className = false !== strpos($provider, '\\') ? $provider : "\\yunwuxin\\auth\\provider\\" . Str::studly($provider);
 
         if (class_exists($className)) {
-            return $this->app->container()->make($className, [$config]);
+            return $this->app->make($className, [$config]);
         }
 
         throw new InvalidArgumentException("Authentication user provider [{$config['type']}] is not defined.");
