@@ -35,6 +35,7 @@ class Gate
 
     /**
      * 是否具有某个角色
+     *
      * @param array|string $name
      * @param bool         $requireAll
      * @return bool
@@ -66,6 +67,7 @@ class Gate
 
     /**
      * 获取用户的所有权限
+     *
      * @return array
      */
     public function getPermissions()
@@ -83,6 +85,7 @@ class Gate
 
     /**
      * 是否具有某个权限
+     *
      * @param      $name
      * @param bool $requireAll
      * @return bool
@@ -115,6 +118,7 @@ class Gate
 
     /**
      * 检查权限
+     *
      * @param       $ability
      * @param array $args
      * @return bool|mixed
@@ -195,17 +199,8 @@ class Gate
      */
     public static function forUser($user)
     {
-        if(is_null($user)){
-            $hash = 'guest';
-        }else {
-            $hash = spl_object_hash($user);
-        }
-        if (!isset(self::$instance[$hash])) {
-            $policies              = Config::get('auth.policies');
-            $policyNamespace       = Config::get('auth.policy_namespace');
-            self::$instance[$hash] = new static($user, $policies, $policyNamespace);
-        }
-
-        return self::$instance[$hash];
+        $policies        = Config::get('auth.policies');
+        $policyNamespace = Config::get('auth.policy_namespace');
+        return new static($user, $policies, $policyNamespace);
     }
 }
