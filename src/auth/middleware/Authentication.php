@@ -30,14 +30,14 @@ class Authentication
         $this->auth = $auth;
     }
 
-    public function handle($request, Closure $next, ...$guards)
+    public function handle($request, Closure $next, $guards)
     {
         $this->authenticate($guards);
 
         return $next($request);
     }
 
-    protected function authenticate(array $guards)
+    protected function authenticate($guards)
     {
         if (empty($guards)) {
             return $this->auth->authenticate();
