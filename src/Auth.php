@@ -14,26 +14,20 @@ namespace yunwuxin;
 use InvalidArgumentException;
 use think\App;
 use think\Config;
-use think\Factory;
 use think\helper\Str;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\guard\Session;
 use yunwuxin\auth\guard\Token;
 use yunwuxin\auth\interfaces\StatefulGuard;
-use yunwuxin\auth\Provider;
 
 /**
  * Class Auth
- *
  * @package yunwuxin
  * @mixin Session
  * @mixin Token
  */
 class Auth
 {
-
-    use Factory;
-
     /** @var Guard[] */
     protected $guards = [];
 
