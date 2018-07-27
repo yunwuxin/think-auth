@@ -17,7 +17,6 @@ use yunwuxin\notification\Notifiable;
 /**
  * Class CanResetPasswordUser
  * @package yunwuxin\auth\traits
- *
  * @mixin Notifiable
  */
 trait CanResetPasswordUser
@@ -29,7 +28,7 @@ trait CanResetPasswordUser
      */
     public function getEmailForResetPassword()
     {
-        return $this->data['email'];
+        return $this->getAttr('email');
     }
 
     /**
@@ -39,6 +38,6 @@ trait CanResetPasswordUser
      */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new ResetPassword($this->data['email'], $token));
+        $this->notify(new ResetPassword($this->getAttr('email'), $token));
     }
 }

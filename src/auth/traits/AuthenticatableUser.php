@@ -16,17 +16,17 @@ trait AuthenticatableUser
 
     public function getAuthId()
     {
-        return $this->data[$this->getPk()];
+        return $this->getAttr($this->getPk());
     }
 
     public function getAuthPassword()
     {
-        return $this->data['password'];
+        return $this->getAttr('password');
     }
 
     public function getRememberToken()
     {
-        return $this->data[$this->getRememberTokenName()];
+        return $this->{$this->getRememberTokenName()};
     }
 
     public function setRememberToken($token)
