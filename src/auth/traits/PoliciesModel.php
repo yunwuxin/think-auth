@@ -8,6 +8,7 @@
 
 namespace yunwuxin\auth\traits;
 
+use yunwuxin\auth\Collection;
 use yunwuxin\facade\Gate;
 
 trait PoliciesModel
@@ -29,5 +30,10 @@ trait PoliciesModel
         $this->append(['policies']);
 
         return $this;
+    }
+
+    public function toCollection($collection, $resultSetType = null)
+    {
+        return parent::toCollection($collection, Collection::class);
     }
 }
