@@ -8,7 +8,8 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-use think\facade\Hook;
+use think\Event;
+use think\event\AppInit;
 use think\facade\Route;
 use think\helper\Hash;
 use yunwuxin\facade\Gate;
@@ -35,7 +36,7 @@ function can($user, $ability, ...$args)
     return Gate::forUser($user)->can($ability, ...$args);
 }
 
-Hook::add('app_init', function (\think\Config $config) {
+Event::listen(AppInit::class, function (\think\Config $config) {
     //注册路由
     $route = $config->get('auth.route');
     if ($route) {

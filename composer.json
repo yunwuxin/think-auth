@@ -17,7 +17,7 @@
         "yunwuxin/think-mail": "^2.0"
     },
     "require-dev": {
-        "topthink/framework": "5.1.x-dev"
+        "topthink/framework": "5.2.x-dev"
     },
     "autoload": {
         "psr-4": {
