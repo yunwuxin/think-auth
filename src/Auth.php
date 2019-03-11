@@ -94,6 +94,6 @@ class Auth
 
     public static function __make(Config $config, App $app)
     {
-        return new self($config->pull('auth'), $app);
+        return new self($config->get('auth'), $app);
     }
 }

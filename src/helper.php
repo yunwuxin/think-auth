@@ -8,8 +8,8 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-use think\Event;
 use think\event\AppInit;
+use think\facade\Event;
 use think\facade\Route;
 use think\helper\Hash;
 use yunwuxin\facade\Gate;
