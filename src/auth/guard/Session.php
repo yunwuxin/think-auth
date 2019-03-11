@@ -11,11 +11,12 @@
 namespace yunwuxin\auth\guard;
 
 use think\Cookie;
+use think\Event;
 use think\helper\Str;
-use think\Hook;
 use think\Response;
-use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\event\Login;
 use yunwuxin\auth\Guard;
+use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\StatefulGuard;
 use yunwuxin\auth\interfaces\SupportsBasicAuth;
@@ -48,17 +49,17 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
 
     protected $session;
 
-    protected $hook;
+    protected $event;
 
     protected $cookie;
 
     protected $request;
 
-    public function __construct(Provider $provider, \think\Session $session, Hook $hook, Cookie $cookie, Request $request)
+    public function __construct(Provider $provider, \think\Session $session, Event $event, Cookie $cookie, Request $request)
     {
         $this->provider = $provider;
         $this->session  = $session;
-        $this->hook     = $hook;
+        $this->event    = $event;
         $this->cookie   = $cookie;
         $this->request  = $request;
     }
@@ -95,7 +96,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
             if ($user) {
                 $this->session->set($this->getName(), $user->getAuthId());
 
-                $this->hook->listen('auth_login', $user, true);
+                $this->event->trigger(new Login($user, true));
             }
         }
 
@@ -256,7 +257,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
             $this->createRecaller($user);
         }
 
-        $this->hook->listen('auth_login', $user, $remember);
+        $this->event->trigger(new Login($user, $remember));
 
         $this->setUser($user);
     }
