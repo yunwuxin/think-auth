@@ -11,10 +11,8 @@
 
 namespace yunwuxin;
 
-use InvalidArgumentException;
 use think\App;
 use think\Config;
-use think\helper\Str;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\guard\Session;
 use yunwuxin\auth\guard\Token;
@@ -68,11 +66,7 @@ class Auth
 
     protected function buildGuard($name)
     {
-        $className = false !== strpos($name, '\\') ? $name : "\\yunwuxin\\auth\\guard\\" . Str::studly($name);
-        if (class_exists($className)) {
-            return $this->app->make($className, [$this->buildProvider()]);
-        }
-        throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
+        return App::factory($name, "\\yunwuxin\\auth\\guard\\", $this->buildProvider());
     }
 
 
@@ -82,13 +76,7 @@ class Auth
 
         $provider = $provider ?: $config['type'];
 
-        $className = false !== strpos($provider, '\\') ? $provider : "\\yunwuxin\\auth\\provider\\" . Str::studly($provider);
-
-        if (class_exists($className)) {
-            return $this->app->make($className, [$config]);
-        }
-
-        throw new InvalidArgumentException("Authentication user provider [{$config['type']}] is not defined.");
+        return App::factory($provider, "\\yunwuxin\\auth\\provider\\", $config);
     }
 
 
