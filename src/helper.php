@@ -34,5 +34,3 @@ function can($user, $ability, ...$args)
 {
     return Gate::forUser($user)->can($ability, ...$args);
 }
-
-App::service(Service::class);
