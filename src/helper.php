@@ -8,9 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-use think\App;
 use think\helper\Hash;
-use yunwuxin\auth\Service;
 use yunwuxin\facade\Gate;
 
 /**

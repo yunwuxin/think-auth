@@ -12,6 +12,6 @@ class Service extends \think\Service
 {
     public function boot()
     {
-        $this->loadRoutesFrom(__DIR__ . '../route.php');
+        $this->loadRoutesFrom(__DIR__ . '/../route.php');
     }
 }
