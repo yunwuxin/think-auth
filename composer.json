@@ -10,9 +10,9 @@
         }
     ],
     "require": {
-        "topthink/framework": "5.2.*-dev",
+        "topthink/framework": "^5.2",
         "topthink/think-installer": "^2.0",
-        "topthink/think-helper": "^1.0"
+        "topthink/think-helper": "^3.0"
     },
     "require-dev": {
         "yunwuxin/think-notification": "^2.0",
