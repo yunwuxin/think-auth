@@ -11,7 +11,6 @@
     ],
     "require": {
         "topthink/framework": "^5.2",
-        "topthink/think-installer": "^2.0",
         "topthink/think-helper": "^3.0"
     },
     "require-dev": {
@@ -31,13 +30,13 @@
         ]
     },
     "extra": {
-        "think-config": {
-            "auth": "src/config.php"
-        },
         "think": {
             "services": [
                 "yunwuxin\\auth\\Service"
-            ]
+            ],
+            "config": {
+                "auth": "src/config.php"
+            }
         }
     }
 }
