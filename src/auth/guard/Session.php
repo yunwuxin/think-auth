@@ -64,7 +64,6 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
         $this->request  = $request;
     }
 
-
     /**
      * 获取通过认证的用户
      *
@@ -126,7 +125,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
     /**
      * 认证用户
      *
-     * @param  array $credentials
+     * @param array $credentials
      * @return bool
      */
     public function validate(array $credentials = [])
@@ -137,7 +136,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
     /**
      * 设置当前用户
      *
-     * @param  Authenticatable $user
+     * @param Authenticatable $user
      * @return Session
      */
     public function setUser(Authenticatable $user)
@@ -174,7 +173,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
 
     protected function getRecaller()
     {
-        return $this->cookie->get($this->getRecallerName());
+        return $this->request->cookie($this->getRecallerName());
     }
 
     protected function getUserByRecaller($recaller)
@@ -204,9 +203,9 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
     /**
      * 尝试登录
      *
-     * @param  array $credentials
-     * @param  bool  $remember
-     * @param  bool  $login
+     * @param array $credentials
+     * @param bool  $remember
+     * @param bool  $login
      * @return bool
      */
     public function attempt(array $credentials = [], $remember = false, $login = true)
@@ -227,7 +226,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
     /**
      * 登录（当前请求有效）
      *
-     * @param  array $credentials
+     * @param array $credentials
      * @return bool
      */
     public function once(array $credentials = [])
@@ -244,8 +243,8 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
     /**
      * 设置登录用户
      *
-     * @param  Authenticatable $user
-     * @param  bool            $remember
+     * @param Authenticatable $user
+     * @param bool            $remember
      * @return void
      */
     public function login(Authenticatable $user, $remember = false)
@@ -265,8 +264,8 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
     /**
      * 通过用户id登录
      *
-     * @param  mixed $id
-     * @param  bool  $remember
+     * @param mixed $id
+     * @param bool  $remember
      * @return false|Authenticatable
      */
     public function loginUsingId($id, $remember = false)
@@ -285,7 +284,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
     /**
      * 通过用户id登录（当前请求有效）
      *
-     * @param  mixed $id
+     * @param mixed $id
      * @return bool|Authenticatable
      */
     public function onceUsingId($id)
@@ -371,7 +370,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
 
     protected function failedBasicResponse()
     {
-        return new Response('Invalid credentials.', 401, ['WWW-Authenticate' => 'Basic']);
+        return (new Response('Invalid credentials.', 401))->header(['WWW-Authenticate' => 'Basic']);
     }
 
     protected function clearUserDataFromStorage()
