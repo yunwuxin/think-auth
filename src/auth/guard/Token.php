@@ -59,19 +59,20 @@ class Token implements Guard
         $token = $this->request->param('access-token');
         if (empty($token)) {
             $header = $this->request->header('Authorization');
-            if (Str::startsWith($header, 'Bearer ')) {
-                $token = Str::substr($header, 7);
+            if (!empty($header)) {
+                if (Str::startsWith($header, 'Bearer ')) {
+                    $token = Str::substr($header, 7);
+                }
             }
         }
 
         return $token;
     }
 
-
     /**
      * 认证用户
      *
-     * @param  array $credentials
+     * @param array $credentials
      * @return bool
      */
     public function validate(array $credentials = [])
