@@ -21,7 +21,7 @@ use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\StatefulGuard;
 use yunwuxin\auth\interfaces\SupportsBasicAuth;
 use yunwuxin\auth\Provider;
-use yunwuxin\auth\Request;
+use think\Request;
 use yunwuxin\auth\traits\GuardHelpers;
 
 class Session implements Guard, StatefulGuard, SupportsBasicAuth
@@ -354,7 +354,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
 
     protected function attemptBasic($field, $extraConditions = [])
     {
-        if (!$this->request->getUser()) {
+        if (!$this->request->server('PHP_AUTH_USER')) {
             return false;
         }
 
@@ -365,7 +365,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
 
     protected function basicCredentials($field)
     {
-        return [$field => $this->request->getUser(), 'password' => $this->request->getPassword()];
+        return [$field => $this->request->server('PHP_AUTH_USER'), 'password' => $this->request->server('PHP_AUTH_PW')];
     }
 
     protected function failedBasicResponse()

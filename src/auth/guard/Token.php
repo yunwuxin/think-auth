@@ -14,7 +14,7 @@ use think\helper\Str;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\Provider;
-use yunwuxin\auth\Request;
+use think\Request;
 use yunwuxin\auth\traits\GuardHelpers;
 
 class Token implements Guard

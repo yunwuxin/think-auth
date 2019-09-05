@@ -10,12 +10,11 @@
         }
     ],
     "require": {
-        "topthink/framework": "^6.0",
-        "topthink/think-helper": "^3.0"
+        "topthink/framework": "^6.0"
     },
     "require-dev": {
-        "yunwuxin/think-notification": "^2.0",
-        "yunwuxin/think-mail": "^2.0"
+        "yunwuxin/think-notification": "^3.0",
+        "yunwuxin/think-mail": "^3.0"
     },
     "suggest": {
         "yunwuxin/think-notification": "Required to send notification.",
@@ -29,6 +28,7 @@
             "src/helper.php"
         ]
     },
+    "minimum-stability": "dev",
     "extra": {
         "think": {
             "services": [
