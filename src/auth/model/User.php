@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\model;
 
-use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\CanResetPassword;
 use yunwuxin\auth\traits\AuthenticatableUser;
@@ -23,7 +23,7 @@ use think\Model;
  * Class User
  * @package think\auth\model
  */
-class User extends Model implements Authenticatable, Authorizable, CanResetPassword
+class User extends Model implements StatefulUser, Authorizable, CanResetPassword
 {
     use AuthenticatableUser, AuthorizableUser, CanResetPasswordUser;
 }

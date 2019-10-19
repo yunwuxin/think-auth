@@ -17,7 +17,7 @@ use think\Model;
 use think\Request;
 use think\Response;
 use think\Validate;
-use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\password\Broker;
 use yunwuxin\auth\password\Exception;
 use yunwuxin\facade\Auth;
@@ -27,7 +27,7 @@ trait ResetPassword
     public function showResetForm(Request $request, $token, $email)
     {
         return view('auth/password/reset', [
-            ['token' => $token, 'email' => $email]
+            ['token' => $token, 'email' => $email],
         ]);
     }
 
@@ -46,7 +46,6 @@ trait ResetPassword
 
         return $this->reseted()
             ?: redirect($this->redirectPath());
-
     }
 
     protected function validate(Request $request)
@@ -66,7 +65,7 @@ trait ResetPassword
      */
     protected function validator(Request $request)
     {
-        return Validate::make([
+        return (new Validate)->rule([
             'token'    => 'require',
             'email'    => 'require|email',
             'password' => 'require|confirm:password_confirm|min:6',
@@ -81,7 +80,7 @@ trait ResetPassword
     }
 
     /**
-     * @param Model|Authenticatable $user
+     * @param Model|StatefulUser    $user
      * @param                       $password
      */
     protected function resetPassword($user, $password)

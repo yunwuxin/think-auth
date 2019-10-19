@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006-2015 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006-2016 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -11,37 +11,37 @@
 
 namespace yunwuxin\auth\interfaces;
 
-interface Authenticatable
+interface Guard
 {
 
     /**
-     * 获取用户ID
+     * 是否通过认证
+     *
      * @return mixed
      */
-    public function getAuthId();
+    public function check();
 
     /**
-     * 获取密码
+     * 获取通过认证的用户
+     *
      * @return mixed
      */
-    public function getAuthPassword();
+    public function user();
+
 
     /**
-     * 获取“记住我”令牌
-     * @return mixed
+     * 认证用户
+     *
+     * @param array $credentials
+     * @return bool
      */
-    public function getRememberToken();
+    public function validate(array $credentials = []);
 
     /**
-     * 设置“记住我”令牌
-     * @param $token
-     * @return mixed
+     * 设置当前用户
+     *
+     * @param  $user
+     * @return $this
      */
-    public function setRememberToken($token);
-
-    /**
-     * 获取“记住我”令牌字段名
-     * @return mixed
-     */
-    public function getRememberTokenName();
+    public function setUser($user);
 }

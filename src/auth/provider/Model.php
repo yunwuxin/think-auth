@@ -10,10 +10,10 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\provider;
 
-use yunwuxin\auth\interfaces\Authenticatable;
-use yunwuxin\auth\Provider;
+use yunwuxin\auth\interfaces\StatefulProvider;
+use yunwuxin\auth\interfaces\StatefulUser;
 
-class Model extends Provider
+class Model implements StatefulProvider
 {
 
     protected $model;
@@ -50,11 +50,11 @@ class Model extends Provider
 
     /**
      * 更新“记住我”的token
-     * @param Authenticatable|\think\Model $user
+     * @param StatefulUser|\think\Model    $user
      * @param                              $token
      * @return mixed
      */
-    public function updateRememberToken(Authenticatable $user, $token)
+    public function updateRememberToken(StatefulUser $user, $token)
     {
         $user->setRememberToken($token);
         $user->save();
@@ -63,7 +63,7 @@ class Model extends Provider
     /**
      * 根据用户输入的数据获取用户
      * @param array $credentials
-     * @return mixed
+     * @return StatefulUser
      */
     public function retrieveByCredentials(array $credentials)
     {
@@ -88,7 +88,7 @@ class Model extends Provider
      * @param array $credentials
      * @return mixed
      */
-    public function validateCredentials(Authenticatable $user, array $credentials)
+    public function validateCredentials(StatefulUser $user, array $credentials)
     {
         $plain = $credentials['password'];
 

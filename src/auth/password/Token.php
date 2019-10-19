@@ -28,9 +28,9 @@ class Token
     {
         $email = $user->getEmailForResetPassword();
 
-        $token = self::createNewToken();
+        $token = $this->createNewToken();
 
-        $this->cache->set(self::getCacheKey($user), self::getPayload($email, $token));
+        $this->cache->set($this->getCacheKey($user), $this->getPayload($email, $token));
 
         return $token;
     }
@@ -52,14 +52,14 @@ class Token
 
     public function exists(CanResetPassword $user, $token)
     {
-        $tokenCache = $this->cache->get(self::getCacheKey($user));
+        $tokenCache = $this->cache->get($this->getCacheKey($user));
 
         return $tokenCache && $tokenCache['token'] == $token && $tokenCache['create_time'] + 30 * 60 > time();
     }
 
     public function delete(CanResetPassword $user)
     {
-        $this->cache->rm(self::getCacheKey($user));
+        $this->cache->delete($this->getCacheKey($user));
     }
 
 }

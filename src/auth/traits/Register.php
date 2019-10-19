@@ -12,7 +12,7 @@
 namespace yunwuxin\auth\traits;
 
 use think\response\View;
-use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\interfaces\StatefulUser;
 use think\exception\ValidateException;
 use think\Request;
 use think\Response;
@@ -56,17 +56,17 @@ trait Register
     }
 
     /**
-     * @param Authenticatable $user
+     * @param StatefulUser $user
      * @return Response|null
      */
-    protected function registered(Authenticatable $user)
+    protected function registered(StatefulUser $user)
     {
         return null;
     }
 
     /**
      * @param Request $request
-     * @return Authenticatable
+     * @return StatefulUser
      */
     protected function create(Request $request)
     {

@@ -39,18 +39,18 @@ interface StatefulGuard
     /**
      * 设置登录用户
      *
-     * @param  Authenticatable $user
-     * @param  bool            $remember
+     * @param  StatefulUser $user
+     * @param  bool         $remember
      * @return void
      */
-    public function login(Authenticatable $user, $remember = false);
+    public function login(StatefulUser $user, $remember = false);
 
     /**
      * 通过用户id登录
      *
      * @param  mixed $id
      * @param  bool  $remember
-     * @return bool|Authenticatable
+     * @return bool|StatefulUser
      */
     public function loginUsingId($id, $remember = false);
 
@@ -58,7 +58,7 @@ interface StatefulGuard
      * 通过用户id登录（当前请求有效）
      *
      * @param  mixed $id
-     * @return bool|Authenticatable
+     * @return bool|StatefulUser
      */
     public function onceUsingId($id);
 

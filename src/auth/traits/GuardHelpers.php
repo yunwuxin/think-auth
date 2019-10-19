@@ -8,19 +8,12 @@
 
 namespace yunwuxin\auth\traits;
 
-
 use yunwuxin\auth\exception\AuthenticationException;
-use yunwuxin\auth\interfaces\Authenticatable;
-use yunwuxin\auth\Provider;
 
 trait GuardHelpers
 {
-    /** @var Authenticatable 当前用户 */
+    /** @var mixed 当前用户 */
     protected $user;
-
-    /** @var Provider */
-    protected $provider;
-
 
     public function authenticate()
     {
@@ -52,24 +45,12 @@ trait GuardHelpers
     }
 
     /**
-     * Get the ID for the currently authenticated user.
-     *
-     * @return int|null
-     */
-    public function id()
-    {
-        if ($this->user()) {
-            return $this->user()->getAuthId();
-        }
-    }
-
-    /**
      * Set the current user.
      *
-     * @param  Authenticatable $user
+     * @param  $user
      * @return $this
      */
-    public function setUser(Authenticatable $user)
+    public function setUser($user)
     {
         $this->user = $user;
 

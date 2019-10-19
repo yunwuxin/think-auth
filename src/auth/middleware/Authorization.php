@@ -15,7 +15,7 @@ use Closure;
 use think\Request;
 use yunwuxin\Auth;
 use yunwuxin\auth\exception\AuthorizationException;
-use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\interfaces\Authorizable;
 
 /**
@@ -42,7 +42,7 @@ class Authorization
     public function handle($request, Closure $next)
     {
 
-        /** @var Authenticatable|Authorizable $user */
+        /** @var StatefulUser|Authorizable $user */
         $user = $this->auth->user();
 
         $routeInfo = $request->routeInfo();

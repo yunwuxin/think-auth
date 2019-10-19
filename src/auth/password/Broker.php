@@ -13,9 +13,9 @@ namespace yunwuxin\auth\password;
 
 use Closure;
 use UnexpectedValueException;
-use yunwuxin\auth\interfaces\Authenticatable;
+use yunwuxin\auth\interfaces\Provider;
+use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\interfaces\CanResetPassword;
-use yunwuxin\auth\Provider;
 use yunwuxin\facade\Auth;
 
 class Broker
@@ -127,7 +127,7 @@ class Broker
 
     /**
      * @param array $credentials
-     * @return Authenticatable|CanResetPassword
+     * @return StatefulUser|CanResetPassword
      */
     protected function getUser(array $credentials)
     {

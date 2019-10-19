@@ -11,16 +11,18 @@
 namespace yunwuxin\auth\guard;
 
 use think\helper\Str;
-use yunwuxin\auth\Guard;
-use yunwuxin\auth\interfaces\Authenticatable;
-use yunwuxin\auth\Provider;
 use think\Request;
+use yunwuxin\auth\interfaces\Guard;
+use yunwuxin\auth\interfaces\Provider;
+use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\traits\GuardHelpers;
 
 class Token implements Guard
 {
-
     use GuardHelpers;
+
+    /** @var Provider */
+    protected $provider;
 
     protected $request;
 
@@ -33,7 +35,7 @@ class Token implements Guard
     /**
      * 获取通过认证的用户
      *
-     * @return Authenticatable|null
+     * @return StatefulUser|null
      */
     public function user()
     {

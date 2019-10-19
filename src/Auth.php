@@ -15,7 +15,7 @@ use InvalidArgumentException;
 use think\helper\Arr;
 use think\helper\Str;
 use think\Manager;
-use yunwuxin\auth\Guard;
+use yunwuxin\auth\contract\Guard;
 use yunwuxin\auth\guard\Session;
 use yunwuxin\auth\guard\Token;
 use yunwuxin\auth\interfaces\StatefulGuard;

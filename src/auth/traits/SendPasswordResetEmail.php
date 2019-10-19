@@ -30,14 +30,13 @@ trait SendPasswordResetEmail
         $this->validate($request);
 
         try {
-            $broker->sendResetLink($request->only('email'));
+            $broker->sendResetLink($request->only(['email']));
         } catch (Exception $e) {
             throw new ValidateException(['email' => $this->getExceptionMessage($e->getMessage())]);
         }
 
         return $this->sended()
             ?: redirect($this->redirectPath());
-
     }
 
     /**
@@ -87,8 +86,8 @@ trait SendPasswordResetEmail
      */
     protected function validator(Request $request)
     {
-        return Validate::make([
-            'email' => 'require|email'
+        return (new Validate)->rule([
+            'email' => 'require|email',
         ])->batch(true);
     }
 }

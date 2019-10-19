@@ -122,10 +122,10 @@ trait Login
      */
     protected function validator(Request $request)
     {
-        return Validate::make([
+        return (new Validate)->rule([
             $this->username() => 'require',
             $this->password() => 'require',
-        ], [], [
+        ], [
             $this->username() => '用户名',
             $this->password() => '密码',
         ])->batch(true);
