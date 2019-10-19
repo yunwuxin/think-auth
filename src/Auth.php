@@ -11,8 +11,10 @@
 
 namespace yunwuxin;
 
-use think\App;
-use think\Config;
+use InvalidArgumentException;
+use think\helper\Arr;
+use think\helper\Str;
+use think\Manager;
 use yunwuxin\auth\Guard;
 use yunwuxin\auth\guard\Session;
 use yunwuxin\auth\guard\Token;
@@ -24,31 +26,16 @@ use yunwuxin\auth\interfaces\StatefulGuard;
  * @mixin Session
  * @mixin Token
  */
-class Auth
+class Auth extends Manager
 {
-    /** @var Guard[] */
-    protected $guards = [];
+    protected $namespace = '\\yunwuxin\\auth\\guard\\';
 
-    protected $config;
-
-    /** @var App */
-    protected $app;
-
-    public function __construct($config, $app)
-    {
-        $this->config = $config;
-        $this->app    = $app;
-    }
+    protected $default = null;
 
     public function shouldUse($name)
     {
-        $this->config['guard'] = $name;
+        $this->default = $name;
         return $this;
-    }
-
-    public function __call($method, $parameters)
-    {
-        return call_user_func_array([$this->guard(), $method], $parameters);
     }
 
     /**
@@ -57,31 +44,107 @@ class Auth
      */
     public function guard($name = null)
     {
-        $name = $name ?: $this->config['guard'];
-
-        return isset($this->guards[$name])
-            ? $this->guards[$name]
-            : $this->guards[$name] = $this->buildGuard($name);
+        return $this->driver($name);
     }
 
-    protected function buildGuard($name)
+    /**
+     * 获取配置
+     * @param null|string $name    名称
+     * @param mixed       $default 默认值
+     * @return mixed
+     */
+    public function getConfig(string $name = null, $default = null)
     {
-        return App::factory($name, "\\yunwuxin\\auth\\guard\\", $this->buildProvider());
+        if (!is_null($name)) {
+            return $this->app->config->get('auth.' . $name, $default);
+        }
+
+        return $this->app->config->get('auth');
     }
 
-
-    public function buildProvider($provider = null)
+    /**
+     * 获取guard配置
+     * @param string      $guard
+     * @param string|null $name
+     * @param null        $default
+     * @return mixed
+     */
+    public function getGuardConfig(string $guard, string $name = null, $default = null)
     {
-        $config = $this->config['provider'];
+        if ($config = $this->getConfig("guards.{$guard}")) {
+            return Arr::get($config, $name, $default);
+        }
 
-        $provider = $provider ?: $config['type'];
-
-        return App::factory($provider, "\\yunwuxin\\auth\\provider\\", $config);
+        throw new InvalidArgumentException("Guard [$guard] not found.");
     }
 
-
-    public static function __make(Config $config, App $app)
+    /**
+     * 获取provider配置
+     * @param string $provider
+     * @param string $name
+     * @param null   $default
+     * @return mixed
+     */
+    public function getProviderConfig(string $provider, string $name = null, $default = null)
     {
-        return new self($config->get('auth'), $app);
+        if ($config = $this->getConfig("providers.{$provider}")) {
+            return Arr::get($config, $name, $default);
+        }
+
+        throw new InvalidArgumentException("Provider [$provider] not found.");
+    }
+
+    /**
+     * 获取驱动类型
+     * @param string $name
+     * @return mixed
+     */
+    protected function resolveType(string $name)
+    {
+        return $this->getGuardConfig($name, 'type');
+    }
+
+    /**
+     * 获取驱动配置
+     * @param string $name
+     * @return mixed
+     */
+    protected function resolveConfig(string $name)
+    {
+        return $this->getGuardConfig($name);
+    }
+
+    protected function resolveParams($name): array
+    {
+        $config   = $this->resolveConfig($name);
+        $provider = $this->createUserProvider($this->getGuardConfig($name, 'provider'));
+
+        return [$provider, $config];
+    }
+
+    protected function createUserProvider($provider)
+    {
+        $config = $this->getProviderConfig($provider);
+
+        $type = Arr::pull($config, 'type');
+
+        $namespace = '\\yunwuxin\\auth\\provider\\';
+
+        $class = false !== strpos($type, '\\') ? $type : $namespace . Str::studly($type);
+
+        if (class_exists($class)) {
+            return $this->app->invokeClass($class, [$config]);
+        }
+
+        throw new InvalidArgumentException("Provider [$type] not supported.");
+    }
+
+    /**
+     * 默认驱动
+     * @return string|null
+     */
+    public function getDefaultDriver()
+    {
+        return $this->default ?? $this->getConfig('default');
     }
 }

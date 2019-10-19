@@ -10,7 +10,6 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\provider;
 
-use think\helper\Hash;
 use yunwuxin\auth\interfaces\Authenticatable;
 use yunwuxin\auth\Provider;
 
@@ -93,7 +92,7 @@ class Model extends Provider
     {
         $plain = $credentials['password'];
 
-        return Hash::check($plain, $user->getAuthPassword());
+        return password_verify($plain, $user->getAuthPassword());
     }
 
     protected function createModel()

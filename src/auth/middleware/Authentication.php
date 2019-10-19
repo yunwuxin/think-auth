@@ -30,9 +30,9 @@ class Authentication
         $this->auth = $auth;
     }
 
-    public function handle($request, Closure $next, $guards)
+    public function handle($request, Closure $next, $guards = null)
     {
-        $this->authenticate($guards);
+        $this->authenticate((array) $guards);
 
         return $next($request);
     }

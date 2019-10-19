@@ -11,6 +11,7 @@
 
 namespace yunwuxin\auth\traits;
 
+use think\response\View;
 use yunwuxin\auth\interfaces\Authenticatable;
 use think\exception\ValidateException;
 use think\Request;
@@ -24,7 +25,7 @@ trait Register
     /**
      * 注册页面
      *
-     * @return \think\response\View
+     * @return View
      */
     public function showRegisterForm()
     {
@@ -56,11 +57,11 @@ trait Register
 
     /**
      * @param Authenticatable $user
-     * @return Response
+     * @return Response|null
      */
     protected function registered(Authenticatable $user)
     {
-
+        return null;
     }
 
     /**
@@ -80,7 +81,7 @@ trait Register
      */
     protected function validator(Request $request)
     {
-        return Validate::make()->batch(true);
+        return (new Validate())->batch(true);
     }
 
     /**

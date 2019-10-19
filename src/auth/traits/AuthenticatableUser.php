@@ -26,12 +26,12 @@ trait AuthenticatableUser
 
     public function getRememberToken()
     {
-        return $this->{$this->getRememberTokenName()};
+        return $this->getAttr($this->getRememberTokenName());
     }
 
     public function setRememberToken($token)
     {
-        $this->{$this->getRememberTokenName()} = $token;
+        $this->setAttr($this->getRememberTokenName(), $token);
 
         $this->save();
     }

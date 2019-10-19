@@ -17,11 +17,23 @@ use yunwuxin\auth\controller\ResetPasswordController;
 use yunwuxin\auth\model\User;
 
 return [
-    'provider'         => [
-        'type'  => 'model',
-        'model' => User::class
+    'default'          => 'web',
+    'guards'           => [
+        'web' => [
+            'type'     => 'session',
+            'provider' => 'user',
+        ],
+        'api' => [
+            'type'     => 'token',
+            'provider' => 'user',
+        ],
     ],
-    'guard'            => 'session',
+    'providers'        => [
+        'user' => [
+            'type'  => 'model',
+            'model' => User::class,
+        ],
+    ],
     //设为false,则不注册路由
     'route'            => [
         'group'       => 'auth',
@@ -29,8 +41,8 @@ return [
             'login'    => LoginController::class,
             'register' => RegisterController::class,
             'forgot'   => ForgotPasswordController::class,
-            'reset'    => ResetPasswordController::class
-        ]
+            'reset'    => ResetPasswordController::class,
+        ],
     ],
     'policy_namespace' => '\\app\\policy\\',
     'policies'         => [],
