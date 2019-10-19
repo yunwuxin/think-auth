@@ -15,9 +15,9 @@ use InvalidArgumentException;
 use think\helper\Arr;
 use think\helper\Str;
 use think\Manager;
-use yunwuxin\auth\contract\Guard;
 use yunwuxin\auth\guard\Session;
 use yunwuxin\auth\guard\Token;
+use yunwuxin\auth\interfaces\Guard;
 use yunwuxin\auth\interfaces\StatefulGuard;
 
 /**
@@ -119,11 +119,14 @@ class Auth extends Manager
         $config   = $this->resolveConfig($name);
         $provider = $this->createUserProvider($this->getGuardConfig($name, 'provider'));
 
-        return [$provider, $config];
+        return [$config, $provider];
     }
 
     protected function createUserProvider($provider)
     {
+        if (is_null($provider)) {
+            return;
+        }
         $config = $this->getProviderConfig($provider);
 
         $type = Arr::pull($config, 'type');
