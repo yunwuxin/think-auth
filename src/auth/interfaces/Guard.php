@@ -28,15 +28,6 @@ interface Guard
      */
     public function user();
 
-
-    /**
-     * 认证用户
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function validate(array $credentials = []);
-
     /**
      * 设置当前用户
      *

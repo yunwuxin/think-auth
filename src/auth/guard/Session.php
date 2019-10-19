@@ -14,13 +14,13 @@ use think\Cookie;
 use think\Event;
 use think\helper\Str;
 use think\Request;
-use think\Response;
 use yunwuxin\auth\event\Login;
+use yunwuxin\auth\exception\UnauthorizedHttpException;
+use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\Guard;
+use yunwuxin\auth\interfaces\StatefulGuard;
 use yunwuxin\auth\interfaces\StatefulProvider;
 use yunwuxin\auth\interfaces\StatefulUser;
-use yunwuxin\auth\interfaces\Authorizable;
-use yunwuxin\auth\interfaces\StatefulGuard;
 use yunwuxin\auth\interfaces\SupportsBasicAuth;
 use yunwuxin\auth\traits\GuardHelpers;
 
@@ -353,7 +353,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
 
     protected function failedBasicResponse()
     {
-        return (new Response('Invalid credentials.', 401))->header(['WWW-Authenticate' => 'Basic']);
+        throw new UnauthorizedHttpException('Basic', 'Invalid credentials.');
     }
 
     protected function clearUserDataFromStorage()

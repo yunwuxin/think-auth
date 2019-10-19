@@ -71,25 +71,4 @@ class Token implements Guard
         return $token;
     }
 
-    /**
-     * 认证用户
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function validate(array $credentials = [])
-    {
-        if (empty($credentials['token'])) {
-            return false;
-        }
-
-        $credentials = ['token' => $credentials['token']];
-
-        if ($this->provider->retrieveByCredentials($credentials)) {
-            return true;
-        }
-
-        return false;
-    }
-
 }
