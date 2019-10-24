@@ -119,7 +119,7 @@ class Auth extends Manager
         $config   = $this->resolveConfig($name);
         $provider = $this->createUserProvider($this->getGuardConfig($name, 'provider'));
 
-        return [$config, $provider];
+        return [$provider, $config];
     }
 
     protected function createUserProvider($provider)
