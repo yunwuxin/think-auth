@@ -58,7 +58,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
 
     protected $request;
 
-    public function __construct(StatefulProvider $provider, \think\Session $session, Event $event, Cookie $cookie, Request $request)
+    public function __construct(\think\Session $session, Event $event, Cookie $cookie, Request $request, StatefulProvider $provider)
     {
         $this->provider = $provider;
         $this->session  = $session;

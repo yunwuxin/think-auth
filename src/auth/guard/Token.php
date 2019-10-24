@@ -26,7 +26,7 @@ class Token implements Guard
 
     protected $request;
 
-    public function __construct(Provider $provider, Request $request)
+    public function __construct(Request $request, Provider $provider)
     {
         $this->provider = $provider;
         $this->request  = $request;
