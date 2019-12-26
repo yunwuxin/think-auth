@@ -9,6 +9,7 @@
 namespace yunwuxin\auth\traits;
 
 use yunwuxin\auth\exception\AuthenticationException;
+use yunwuxin\auth\interfaces\Provider;
 
 trait GuardHelpers
 {
@@ -55,5 +56,15 @@ trait GuardHelpers
         $this->user = $user;
 
         return $this;
+    }
+
+    /**
+     * Get the user provider used by the guard.
+     *
+     * @return Provider
+     */
+    public function getProvider()
+    {
+        return $this->provider;
     }
 }
