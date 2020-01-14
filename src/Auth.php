@@ -49,8 +49,8 @@ class Auth extends Manager
 
     /**
      * 获取配置
-     * @param null|string $name    名称
-     * @param mixed       $default 默认值
+     * @param null|string $name 名称
+     * @param mixed $default 默认值
      * @return mixed
      */
     public function getConfig(string $name = null, $default = null)
@@ -64,9 +64,9 @@ class Auth extends Manager
 
     /**
      * 获取guard配置
-     * @param string      $guard
+     * @param string $guard
      * @param string|null $name
-     * @param null        $default
+     * @param null $default
      * @return mixed
      */
     public function getGuardConfig(string $guard, string $name = null, $default = null)
@@ -82,7 +82,7 @@ class Auth extends Manager
      * 获取provider配置
      * @param string $provider
      * @param string $name
-     * @param null   $default
+     * @param null $default
      * @return mixed
      */
     public function getProviderConfig(string $provider, string $name = null, $default = null)

@@ -11,14 +11,20 @@
 
 namespace yunwuxin\auth;
 
+use think\App;
 use think\Config;
 use think\helper\Str;
+use yunwuxin\Auth;
 use yunwuxin\auth\traits\AuthorizableUser as User;
 
 class Gate
 {
-    /** @var User */
-    protected $user;
+    protected $app;
+
+    /**
+     * @var callable
+     */
+    protected $userResolver;
 
     protected $policies;
 
@@ -26,30 +32,29 @@ class Gate
 
     protected static $instance = [];
 
-    public function __construct($policies = [], $policyNamespace = null)
+    public function __construct(App $app, callable $userResolver, array $policies = [], string $policyNamespace = null)
     {
-        $this->policies        = (array) $policies;
+        $this->app             = $app;
+        $this->userResolver    = $userResolver;
+        $this->policies        = $policies;
         $this->policyNamespace = $policyNamespace;
-    }
-
-    public function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
     }
 
     /**
      * 是否具有某个角色
      *
      * @param array|string $name
-     * @param bool         $requireAll
+     * @param bool $requireAll
      * @return bool
      */
     public function hasRole($name, $requireAll = false)
     {
-        if (!$this->user) {
+        $user = $this->resolveUser();
+
+        if (!$user) {
             return false;
         }
+
         if (is_array($name)) {
             foreach ($name as $roleName) {
                 $hasRole = $this->hasRole($roleName);
@@ -61,7 +66,7 @@ class Gate
             }
             return $requireAll;
         } else {
-            foreach ($this->user->getRoles() as $role) {
+            foreach ($user->getRoles() as $role) {
                 if ($role->getName() == $name) {
                     return true;
                 }
@@ -77,14 +82,18 @@ class Gate
      */
     public function getPermissions()
     {
-        if (!$this->user) {
+        $user = $this->resolveUser();
+
+        if (!$user) {
             return [];
         }
-        $roles       = $this->user->getRoles();
+
+        $roles       = $user->getRoles();
         $permissions = [];
         array_map(function (Role $role) use (&$permissions) {
             $permissions = array_merge($permissions, $role->getPermissions());
         }, $roles);
+
         return $permissions;
     }
 
@@ -97,9 +106,6 @@ class Gate
      */
     public function hasPermission($name, $requireAll = false)
     {
-        if (!$this->user) {
-            return false;
-        }
         if (is_array($name)) {
             foreach ($name as $permissionName) {
                 $hasPermission = $this->hasPermission($permissionName);
@@ -132,10 +138,10 @@ class Gate
     {
         if (isset($args[0])) {
             if (!is_null($policy = $this->getPolicyFor($args[0]))) {
-
+                $user = $this->resolveUser();
                 //前置检查
                 if (method_exists($policy, 'before')) {
-                    $result = $policy->before($this->user, $ability, ...$args);
+                    $result = $policy->before($user, $ability, ...$args);
                     if (!is_null($result)) {
                         return $result;
                     }
@@ -148,14 +154,13 @@ class Gate
                 }
 
                 return is_callable([$policy, $ability])
-                    ? $policy->{$ability}($this->user, ...$args)
+                    ? $policy->{$ability}($user, ...$args)
                     : false;
             }
         }
 
         //直接检查角色里的权限列表定义
         return $this->hasPermission($ability, true);
-
     }
 
     protected function formatAbilityToMethod($ability)
@@ -199,21 +204,32 @@ class Gate
     }
 
     /**
+     * @return User
+     */
+    protected function resolveUser()
+    {
+        return call_user_func($this->userResolver);
+    }
+
+    /**
      * @param $user
      * @return static
      */
     public function forUser($user)
     {
-        return (new static($this->policies, $this->policyNamespace))->setUser($user);
+        return new static($this->app, function () use ($user) {
+            return $user;
+        }, $this->policies, $this->policyNamespace);
     }
 
-
-    public static function __make(Config $config)
+    public static function __make(App $app, Config $config, Auth $auth)
     {
         $policies        = $config->get('auth.policies');
         $policyNamespace = $config->get('auth.policy_namespace');
 
-        return new self($policies, $policyNamespace);
+        return new self($app, function () use ($auth) {
+            return $auth->guard()->user();
+        }, $policies, $policyNamespace);
     }
 
 }

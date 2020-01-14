@@ -28,7 +28,6 @@
             "src/helper.php"
         ]
     },
-    "minimum-stability": "dev",
     "extra": {
         "think": {
             "services": [
