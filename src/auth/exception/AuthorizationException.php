@@ -15,8 +15,8 @@ use think\exception\HttpException;
 
 class AuthorizationException extends HttpException
 {
-    public function __construct()
+    public function __construct($message = "Forbidden")
     {
-        parent::__construct(403, "Forbidden");
+        parent::__construct(403, $message);
     }
 }

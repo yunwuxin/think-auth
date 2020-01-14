@@ -11,9 +11,10 @@
 
 namespace yunwuxin\auth\traits;
 
+use ErrorException;
 use think\helper\Str;
 use yunwuxin\auth\exception\AuthorizationException;
-use yunwuxin\facade\Auth;
+use yunwuxin\facade\Gate;
 
 /**
  * 控制器鉴权
@@ -25,10 +26,10 @@ trait Authorize
 {
     protected function authorize($ability, ...$args)
     {
-        $user = Auth::user();
+        $result = Gate::raw($ability, ...$args);
 
-        if (!can($user, $ability, ...$args)) {
-            throw new AuthorizationException;
+        if ($result !== true) {
+            throw new AuthorizationException($result);
         }
     }
 
@@ -52,7 +53,7 @@ trait Authorize
                 $this->authorize($ability, $object);
             }
         } else {
-            throw new \ErrorException("Call to undefined method {$method}");
+            throw new ErrorException("Call to undefined method {$method}");
         }
     }
 }

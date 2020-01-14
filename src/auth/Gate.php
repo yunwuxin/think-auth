@@ -136,6 +136,11 @@ class Gate
      */
     public function can($ability, ...$args)
     {
+        return $this->raw($ability, ...$args) === true;
+    }
+
+    public function raw($ability, ...$args)
+    {
         if (isset($args[0])) {
             if (!is_null($policy = $this->getPolicyFor($args[0]))) {
                 $user = $this->resolveUser();
