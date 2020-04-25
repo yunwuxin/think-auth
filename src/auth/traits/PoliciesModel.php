@@ -32,7 +32,7 @@ trait PoliciesModel
         return $this;
     }
 
-    public function toCollection($collection, $resultSetType = null)
+    public function toCollection(iterable $collection = [], string $resultSetType = null): \think\Collection
     {
         return parent::toCollection($collection, Collection::class);
     }
