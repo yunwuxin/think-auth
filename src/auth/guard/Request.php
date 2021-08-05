@@ -19,7 +19,7 @@ class Request implements Guard
         $this->callback = $callback;
     }
 
-    public function __make(\think\Request $request, $config)
+    static public function __make(\think\Request $request, $config)
     {
         $callback = Arr::get($config, 'callback');
 
