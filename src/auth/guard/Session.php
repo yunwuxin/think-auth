@@ -17,19 +17,15 @@ use think\Request;
 use yunwuxin\auth\event\Login;
 use yunwuxin\auth\exception\UnauthorizedHttpException;
 use yunwuxin\auth\interfaces\Authorizable;
-use yunwuxin\auth\interfaces\Guard;
 use yunwuxin\auth\interfaces\StatefulGuard;
 use yunwuxin\auth\interfaces\StatefulProvider;
 use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\interfaces\SupportsBasicAuth;
 use yunwuxin\auth\traits\GuardHelpers;
 
-class Session implements Guard, StatefulGuard, SupportsBasicAuth
+class Session implements StatefulGuard, SupportsBasicAuth
 {
     use GuardHelpers;
-
-    /** @var StatefulProvider */
-    protected $provider;
 
     /**
      * 上次通过认证的用户
@@ -164,7 +160,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
         if ($this->validRecaller($recaller) && !$this->tokenRetrievalAttempted) {
             $this->tokenRetrievalAttempted = true;
 
-            list($id, $token) = explode('|', $recaller, 2);
+            [$id, $token] = explode('|', $recaller, 2);
 
             $this->viaRemember = !is_null($user = $this->provider->retrieveByToken($id, $token));
 
@@ -187,8 +183,8 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
      * 尝试登录
      *
      * @param array $credentials
-     * @param bool  $remember
-     * @param bool  $login
+     * @param bool $remember
+     * @param bool $login
      * @return bool
      */
     public function attempt(array $credentials = [], $remember = false, $login = true)
@@ -227,7 +223,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
      * 设置登录用户
      *
      * @param StatefulUser $user
-     * @param bool         $remember
+     * @param bool $remember
      * @return void
      */
     public function login(StatefulUser $user, $remember = false)
@@ -248,7 +244,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
      * 通过用户id登录
      *
      * @param mixed $id
-     * @param bool  $remember
+     * @param bool $remember
      * @return false|StatefulUser
      */
     public function loginUsingId($id, $remember = false)
@@ -323,7 +319,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        return $this->failedBasicResponse();
+        $this->failedBasicResponse();
     }
 
     public function onceBasic($field = 'email', $extraConditions = [])
@@ -331,7 +327,7 @@ class Session implements Guard, StatefulGuard, SupportsBasicAuth
         $credentials = $this->basicCredentials($field);
 
         if (!$this->once(array_merge($credentials, $extraConditions))) {
-            return $this->failedBasicResponse();
+            $this->failedBasicResponse();
         }
     }
 

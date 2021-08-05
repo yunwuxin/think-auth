@@ -81,7 +81,7 @@ class Auth extends Manager
     /**
      * 获取provider配置
      * @param string $provider
-     * @param string $name
+     * @param string|null $name
      * @param null $default
      * @return mixed
      */
@@ -116,17 +116,21 @@ class Auth extends Manager
 
     protected function resolveParams($name): array
     {
-        $config   = $this->resolveConfig($name);
-        $provider = $this->createUserProvider($this->getGuardConfig($name, 'provider'));
+        $config = $this->resolveConfig($name);
+
+        $providerName = $this->getGuardConfig($name, 'provider');
+
+        if (empty($providerName)) {
+            return [$config];
+        }
+
+        $provider = $this->createUserProvider($providerName);
 
         return [$provider, $config];
     }
 
     protected function createUserProvider($provider)
     {
-        if (is_null($provider)) {
-            return;
-        }
         $config = $this->getProviderConfig($provider);
 
         $type = Arr::pull($config, 'type');

@@ -21,9 +21,6 @@ class Token implements Guard
 {
     use GuardHelpers;
 
-    /** @var Provider */
-    protected $provider;
-
     protected $request;
 
     public function __construct(Request $request, Provider $provider)

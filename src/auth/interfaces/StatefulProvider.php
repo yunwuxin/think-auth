@@ -21,15 +21,15 @@ interface StatefulProvider extends Provider
 
     /**
      * 更新“记住我”的token
-     * @param StatefulUser    $user
-     * @param                 $token
+     * @param StatefulUser $user
+     * @param $token
      * @return mixed
      */
     public function updateRememberToken(StatefulUser $user, $token);
 
     /**
      * 验证密码
-     * @param       $user
+     * @param StatefulUser $user
      * @param array $credentials
      * @return mixed
      */

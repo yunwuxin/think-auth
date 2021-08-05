@@ -16,23 +16,15 @@ namespace yunwuxin\auth\interfaces;
  * Interface StatefulGuard
  * @package yunwuxin\auth\interfaces
  */
-interface StatefulGuard
+interface StatefulGuard extends Guard
 {
-
-    /**
-     * 认证用户
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function validate(array $credentials = []);
 
     /**
      * 尝试登录
      *
      * @param array $credentials
-     * @param bool  $remember
-     * @param bool  $login
+     * @param bool $remember
+     * @param bool $login
      * @return bool
      */
     public function attempt(array $credentials = [], $remember = false, $login = true);
@@ -49,7 +41,7 @@ interface StatefulGuard
      * 设置登录用户
      *
      * @param StatefulUser $user
-     * @param bool         $remember
+     * @param bool $remember
      * @return void
      */
     public function login(StatefulUser $user, $remember = false);
@@ -58,7 +50,7 @@ interface StatefulGuard
      * 通过用户id登录
      *
      * @param mixed $id
-     * @param bool  $remember
+     * @param bool $remember
      * @return bool|StatefulUser
      */
     public function loginUsingId($id, $remember = false);

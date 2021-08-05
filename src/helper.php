@@ -8,24 +8,12 @@
 // +----------------------------------------------------------------------
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
-use think\helper\Hash;
 use yunwuxin\facade\Gate;
 
 /**
- * 加密
- *
- * @param $value
- * @return bool|string
- */
-function encrypt($value)
-{
-    return Hash::make($value);
-}
-
-/**
- * @param mixed  $user
+ * @param mixed $user
  * @param string $ability
- * @param array  $args
+ * @param array $args
  * @return bool
  */
 function can($user, $ability, ...$args)

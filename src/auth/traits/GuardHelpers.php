@@ -1,20 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: yunwuxin
- * Date: 2018/5/11
- * Time: 18:21
- */
 
 namespace yunwuxin\auth\traits;
 
 use yunwuxin\auth\exception\AuthenticationException;
 use yunwuxin\auth\interfaces\Provider;
+use yunwuxin\auth\interfaces\StatefulProvider;
 
 trait GuardHelpers
 {
     /** @var mixed 当前用户 */
     protected $user;
+
+    /** @var Provider|StatefulProvider */
+    protected $provider;
 
     public function authenticate()
     {
