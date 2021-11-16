@@ -14,13 +14,43 @@ trait GuardHelpers
     /** @var Provider|StatefulProvider */
     protected $provider;
 
-    public function authenticate()
+    protected $lastValidated;
+
+    public function validate(array $credentials = [])
     {
-        if (!is_null($user = $this->user())) {
-            return $user;
+        $this->lastValidated = $this->provider->retrieveByCredentials($credentials);
+        return !is_null($this->lastValidated);
+    }
+
+    public function user()
+    {
+        if (!is_null($this->user)) {
+            return $this->user;
+        }
+    }
+
+    /**
+     * 登录（当前请求有效）
+     *
+     * @param array $credentials
+     * @return bool
+     */
+    public function once(array $credentials = [])
+    {
+        if ($this->validate($credentials)) {
+            $this->setUser($this->lastValidated);
+
+            return true;
         }
 
-        throw new AuthenticationException;
+        return false;
+    }
+
+    public function authenticate()
+    {
+        if (!$this->check()) {
+            throw new AuthenticationException;
+        }
     }
 
     /**
@@ -31,16 +61,6 @@ trait GuardHelpers
     public function check()
     {
         return !is_null($this->user());
-    }
-
-    /**
-     * Determine if the current user is a guest.
-     *
-     * @return bool
-     */
-    public function guest()
-    {
-        return !$this->check();
     }
 
     /**

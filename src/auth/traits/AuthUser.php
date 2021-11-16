@@ -15,7 +15,6 @@ use yunwuxin\facade\Auth;
 
 trait AuthUser
 {
-
     public function user()
     {
         return Auth::user();

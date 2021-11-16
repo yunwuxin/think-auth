@@ -19,20 +19,9 @@ use yunwuxin\auth\exception\UnauthorizedHttpException;
 use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\StatefulGuard;
 use yunwuxin\auth\interfaces\StatefulProvider;
-use yunwuxin\auth\interfaces\StatefulUser;
-use yunwuxin\auth\interfaces\SupportsBasicAuth;
-use yunwuxin\auth\traits\GuardHelpers;
 
-class Session implements StatefulGuard, SupportsBasicAuth
+class Session extends Password implements StatefulGuard
 {
-    use GuardHelpers;
-
-    /**
-     * 上次通过认证的用户
-     *
-     * @var StatefulUser
-     */
-    protected $lastAttempted;
 
     /**
      * 是否通过cookie记住用户
@@ -54,19 +43,19 @@ class Session implements StatefulGuard, SupportsBasicAuth
 
     protected $request;
 
-    public function __construct(\think\Session $session, Event $event, Cookie $cookie, Request $request, StatefulProvider $provider)
+    public function __construct(StatefulProvider $provider, \think\Session $session, Event $event, Cookie $cookie, Request $request)
     {
-        $this->provider = $provider;
-        $this->session  = $session;
-        $this->event    = $event;
-        $this->cookie   = $cookie;
-        $this->request  = $request;
+        $this->session = $session;
+        $this->event   = $event;
+        $this->cookie  = $cookie;
+        $this->request = $request;
+        parent::__construct($provider);
     }
 
     /**
      * 获取通过认证的用户
      *
-     * @return StatefulUser|Authorizable|null
+     * @return Authorizable|mixed|null
      */
     public function user()
     {
@@ -92,24 +81,13 @@ class Session implements StatefulGuard, SupportsBasicAuth
             $user = $this->getUserByRecaller($recaller);
 
             if ($user) {
-                $this->session->set($this->getName(), $user->getAuthId());
+                $this->session->set($this->getName(), $this->provider->getId($user));
 
                 $this->event->trigger(new Login($user, true));
             }
         }
 
         return $this->user = $user;
-    }
-
-    /**
-     * 认证用户
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function validate(array $credentials = [])
-    {
-        return $this->attempt($credentials, false, false);
     }
 
     /**
@@ -123,16 +101,6 @@ class Session implements StatefulGuard, SupportsBasicAuth
         $this->user      = $user;
         $this->loggedOut = false;
         return $this;
-    }
-
-    /**
-     * 获取上次通过认证的用户
-     *
-     * @return StatefulUser
-     */
-    public function getLastAttempted()
-    {
-        return $this->lastAttempted;
     }
 
     /**
@@ -184,35 +152,12 @@ class Session implements StatefulGuard, SupportsBasicAuth
      *
      * @param array $credentials
      * @param bool $remember
-     * @param bool $login
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false, $login = true)
-    {
-        $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
-
-        if ($this->hasValidCredentials($user, $credentials)) {
-            if ($login) {
-                $this->login($user, $remember);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 登录（当前请求有效）
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function once(array $credentials = [])
+    public function attempt(array $credentials = [], $remember = false)
     {
         if ($this->validate($credentials)) {
-            $this->setUser($this->lastAttempted);
-
+            $this->login($this->lastValidated, $remember);
             return true;
         }
 
@@ -222,13 +167,13 @@ class Session implements StatefulGuard, SupportsBasicAuth
     /**
      * 设置登录用户
      *
-     * @param StatefulUser $user
+     * @param mixed $user
      * @param bool $remember
      * @return void
      */
-    public function login(StatefulUser $user, $remember = false)
+    public function login($user, $remember = false)
     {
-        $this->session->set($this->getName(), $user->getAuthId());
+        $this->session->set($this->getName(), $this->provider->getId($user));
 
         if ($remember) {
             $this->createRememberTokenIfDoesntExist($user);
@@ -238,45 +183,6 @@ class Session implements StatefulGuard, SupportsBasicAuth
         $this->event->trigger(new Login($user, $remember));
 
         $this->setUser($user);
-    }
-
-    /**
-     * 通过用户id登录
-     *
-     * @param mixed $id
-     * @param bool $remember
-     * @return false|StatefulUser
-     */
-    public function loginUsingId($id, $remember = false)
-    {
-        $user = $this->provider->retrieveById($id);
-
-        if (!is_null($user)) {
-            $this->login($user, $remember);
-
-            return $user;
-        }
-
-        return false;
-    }
-
-    /**
-     * 通过用户id登录（当前请求有效）
-     *
-     * @param mixed $id
-     * @return bool|StatefulUser
-     */
-    public function onceUsingId($id)
-    {
-        $user = $this->provider->retrieveById($id);
-
-        if (!is_null($user)) {
-            $this->setUser($user);
-
-            return $user;
-        }
-
-        return false;
     }
 
     /**
@@ -362,28 +268,21 @@ class Session implements StatefulGuard, SupportsBasicAuth
         }
     }
 
-    protected function hasValidCredentials($user, $credentials)
+    protected function createRememberTokenIfDoesntExist($user)
     {
-        return !is_null($user) && $this->provider->validateCredentials($user, $credentials);
-    }
-
-    protected function createRememberTokenIfDoesntExist(StatefulUser $user)
-    {
-        if (empty($user->getRememberToken())) {
+        if (empty($this->provider->getRememberToken($user))) {
             $this->refreshRememberToken($user);
         }
     }
 
-    protected function refreshRememberToken(StatefulUser $user)
+    protected function refreshRememberToken($user)
     {
-        $user->setRememberToken($token = Str::random(60));
-
-        $this->provider->updateRememberToken($user, $token);
+        $this->provider->setRememberToken($user, Str::random(60));
     }
 
-    protected function createRecaller(StatefulUser $user)
+    protected function createRecaller($user)
     {
-        $value = $user->getAuthId() . '|' . $user->getRememberToken();
+        $value = $this->provider->getId($user) . '|' . $this->provider->getRememberToken($user);
         $this->cookie->forever($this->getRecallerName(), $value);
     }
 

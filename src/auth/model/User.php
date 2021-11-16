@@ -10,20 +10,18 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\model;
 
-use yunwuxin\auth\interfaces\StatefulUser;
+use think\Model;
 use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\CanResetPassword;
-use yunwuxin\auth\traits\AuthenticatableUser;
 use yunwuxin\auth\traits\AuthorizableUser;
 use yunwuxin\auth\traits\CanResetPasswordUser;
-use think\Model;
 
 /**
  * 默认用户模型
  * Class User
  * @package think\auth\model
  */
-class User extends Model implements StatefulUser, Authorizable, CanResetPassword
+class User extends Model implements Authorizable, CanResetPassword
 {
-    use AuthenticatableUser, AuthorizableUser, CanResetPasswordUser;
+    use AuthorizableUser, CanResetPasswordUser;
 }

@@ -14,8 +14,8 @@ use think\exception\HttpException;
 
 class AuthenticationException extends HttpException
 {
-    public function __construct()
+    public function __construct($message = 'Unauthorized', array $headers = [])
     {
-        parent::__construct(401, 'Unauthorized');
+        parent::__construct(401, $message, null, $headers);
     }
 }

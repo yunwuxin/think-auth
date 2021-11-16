@@ -13,11 +13,16 @@ namespace yunwuxin\auth\interfaces;
 
 interface Guard
 {
+    /**
+     * 认证用户
+     * @return mixed
+     */
+    public function authenticate();
 
     /**
      * 是否通过认证
      *
-     * @return mixed
+     * @return bool
      */
     public function check();
 
@@ -43,4 +48,12 @@ interface Guard
      * @return bool
      */
     public function validate(array $credentials = []);
+
+    /**
+     * 登录（当前请求有效）
+     *
+     * @param array $credentials
+     * @return bool
+     */
+    public function once(array $credentials = []);
 }

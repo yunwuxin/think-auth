@@ -18,50 +18,16 @@ namespace yunwuxin\auth\interfaces;
  */
 interface StatefulGuard extends Guard
 {
-
-    /**
-     * 尝试登录
-     *
-     * @param array $credentials
-     * @param bool $remember
-     * @param bool $login
-     * @return bool
-     */
-    public function attempt(array $credentials = [], $remember = false, $login = true);
-
-    /**
-     * 登录（当前请求有效）
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function once(array $credentials = []);
+    public function attempt(array $credentials = [], $remember = false);
 
     /**
      * 设置登录用户
      *
-     * @param StatefulUser $user
+     * @param mixed $user
      * @param bool $remember
      * @return void
      */
-    public function login(StatefulUser $user, $remember = false);
-
-    /**
-     * 通过用户id登录
-     *
-     * @param mixed $id
-     * @param bool $remember
-     * @return bool|StatefulUser
-     */
-    public function loginUsingId($id, $remember = false);
-
-    /**
-     * 通过用户id登录（当前请求有效）
-     *
-     * @param mixed $id
-     * @return bool|StatefulUser
-     */
-    public function onceUsingId($id);
+    public function login($user, $remember = false);
 
     /**
      * 用户是否使用了“记住我”

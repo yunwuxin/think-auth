@@ -10,17 +10,57 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\provider;
 
+use think\helper\Arr;
 use yunwuxin\auth\interfaces\StatefulProvider;
-use yunwuxin\auth\interfaces\StatefulUser;
+use yunwuxin\auth\model\User;
 
 class Model implements StatefulProvider
 {
 
     protected $model;
+    protected $fields = [
+        'password'       => 'password',
+        'remember_token' => 'remember_token',
+    ];
 
     public function __construct($config)
     {
-        $this->model = $config['model'];
+        $this->model  = Arr::get($config, 'model', User::class);
+        $this->fields = array_merge($this->fields, Arr::get($config, 'fields', []));
+    }
+
+    protected function getFieldName($name)
+    {
+        return Arr::get($this->fields, $name);
+    }
+
+    /**
+     * @param \think\Model $user
+     * @return mixed
+     */
+    public function getId($user)
+    {
+        return $user->getAttr($user->getPk());
+    }
+
+    /**
+     * @param \think\Model $user
+     * @return string
+     */
+    public function getRememberToken($user)
+    {
+        return $user->getAttr($this->getFieldName('remember_token'));
+    }
+
+    /**
+     * @param \think\Model $user
+     * @param string $token
+     * @return void
+     */
+    public function setRememberToken($user, $token)
+    {
+        $user->setAttr($this->getFieldName('remember_token'), $token);
+        $user->save();
     }
 
     /**
@@ -44,26 +84,14 @@ class Model implements StatefulProvider
         $model = $this->createModel();
 
         return $model->where($model->getPk(), $id)
-            ->where($model->getRememberTokenName(), $token)
-            ->find();
-    }
-
-    /**
-     * 更新“记住我”的token
-     * @param StatefulUser|\think\Model    $user
-     * @param                              $token
-     * @return mixed
-     */
-    public function updateRememberToken(StatefulUser $user, $token)
-    {
-        $user->setRememberToken($token);
-        $user->save();
+                     ->where($model->getRememberTokenName(), $token)
+                     ->find();
     }
 
     /**
      * 根据用户输入的数据获取用户
      * @param array $credentials
-     * @return StatefulUser
+     * @return mixed
      */
     public function retrieveByCredentials(array $credentials)
     {
@@ -79,20 +107,17 @@ class Model implements StatefulProvider
             }
         }
 
-        return $this->createModel()->where($data)->find();
-    }
+        $user = $this->createModel()->where($data)->find();
 
-    /**
-     * 验证密码
-     * @param       $user
-     * @param array $credentials
-     * @return mixed
-     */
-    public function validateCredentials(StatefulUser $user, array $credentials)
-    {
-        $plain = $credentials['password'];
+        if (
+            $user
+            && isset($credentials['password'])
+            && password_verify($credentials['password'], $user->getAttr($this->getFieldName('password')))
+        ) {
+            return $user;
+        }
 
-        return password_verify($plain, $user->getAuthPassword());
+        return null;
     }
 
     protected function createModel()

@@ -43,12 +43,17 @@ class Authentication
             return $this->auth->authenticate();
         }
 
+        $lastException = null;
+
         foreach ($guards as $guard) {
-            if ($this->auth->guard($guard)->check()) {
+            try {
+                $this->auth->guard($guard)->authenticate();
                 return $this->auth->shouldUse($guard);
+            } catch (AuthenticationException $e) {
+                $lastException = $e;
             }
         }
 
-        throw new AuthenticationException();
+        throw $lastException;
     }
 }

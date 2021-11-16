@@ -40,7 +40,7 @@ class Auth extends Manager
 
     /**
      * @param null $name
-     * @return mixed|Guard|StatefulGuard|Session|Token
+     * @return Guard|StatefulGuard|Session|Token
      */
     public function guard($name = null)
     {
@@ -120,16 +120,12 @@ class Auth extends Manager
 
         $providerName = $this->getGuardConfig($name, 'provider');
 
-        if (empty($providerName)) {
-            return [$config];
-        }
-
         $provider = $this->createUserProvider($providerName);
 
         return [$provider, $config];
     }
 
-    protected function createUserProvider($provider)
+    public function createUserProvider($provider)
     {
         $config = $this->getProviderConfig($provider);
 

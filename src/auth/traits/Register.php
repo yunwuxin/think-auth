@@ -11,11 +11,10 @@
 
 namespace yunwuxin\auth\traits;
 
-use think\response\View;
-use yunwuxin\auth\interfaces\StatefulUser;
 use think\exception\ValidateException;
 use think\Request;
 use think\Response;
+use think\response\View;
 use think\Validate;
 use yunwuxin\facade\Auth;
 
@@ -56,17 +55,17 @@ trait Register
     }
 
     /**
-     * @param StatefulUser $user
+     * @param mixed $user
      * @return Response|null
      */
-    protected function registered(StatefulUser $user)
+    protected function registered($user)
     {
         return null;
     }
 
     /**
      * @param Request $request
-     * @return StatefulUser
+     * @return mixed
      */
     protected function create(Request $request)
     {

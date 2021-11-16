@@ -12,10 +12,10 @@
 namespace yunwuxin\auth\password;
 
 use Closure;
+use think\App;
 use UnexpectedValueException;
-use yunwuxin\auth\interfaces\Provider;
-use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\interfaces\CanResetPassword;
+use yunwuxin\auth\interfaces\Provider;
 use yunwuxin\facade\Auth;
 
 class Broker
@@ -34,10 +34,13 @@ class Broker
     /** @var Token */
     protected $token;
 
+    /** @var Auth */
+    protected $auth;
 
-    public function __construct(Token $token)
+    public function __construct(App $app, \yunwuxin\Auth $auth, Token $token)
     {
-        $this->token = $token;
+        $this->token    = $token;
+        $this->provider = $auth->createUserProvider($app->config->get('auth.password.provider'));
     }
 
     /**
@@ -58,7 +61,7 @@ class Broker
     /**
      * 重置密码
      *
-     * @param array   $credentials
+     * @param array $credentials
      * @param Closure $callback
      * @return string
      */
@@ -103,13 +106,12 @@ class Broker
     protected function validateNewPassword(array $credentials)
     {
         if (isset($this->passwordValidator)) {
-            list($password, $confirm) = [
+            [$password, $confirm] = [
                 $credentials['password'],
                 $credentials['password_confirm'],
             ];
 
-            return call_user_func(
-                    $this->passwordValidator, $credentials) && $password === $confirm;
+            return call_user_func($this->passwordValidator, $credentials) && $password === $confirm;
         }
 
         return $this->validatePasswordWithDefaults($credentials);
@@ -117,7 +119,7 @@ class Broker
 
     protected function validatePasswordWithDefaults(array $credentials)
     {
-        list($password, $confirm) = [
+        [$password, $confirm] = [
             $credentials['password'],
             $credentials['password_confirm'],
         ];
@@ -127,7 +129,7 @@ class Broker
 
     /**
      * @param array $credentials
-     * @return StatefulUser|CanResetPassword
+     * @return CanResetPassword
      */
     protected function getUser(array $credentials)
     {
@@ -135,7 +137,7 @@ class Broker
             unset($credentials['token']);
         }
 
-        $user = Auth::buildProvider()->retrieveByCredentials($credentials);
+        $user = $this->provider->retrieveByCredentials($credentials);
 
         if ($user && !$user instanceof CanResetPassword) {
             throw new UnexpectedValueException('User must implement CanResetPassword interface.');

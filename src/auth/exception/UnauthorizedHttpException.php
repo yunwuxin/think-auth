@@ -2,15 +2,14 @@
 
 namespace yunwuxin\auth\exception;
 
-use Exception;
-use think\exception\HttpException;
-
-class UnauthorizedHttpException extends HttpException
+class UnauthorizedHttpException extends AuthenticationException
 {
-    public function __construct(string $challenge, string $message = null, Exception $previous = null, ?int $code = 0, array $headers = [])
+    public function __construct(string $challenge, $message = null)
     {
-        $headers['WWW-Authenticate'] = $challenge;
+        $headers = [
+            'WWW-Authenticate' => $challenge,
+        ];
 
-        parent::__construct(401, $message, $previous, $headers, $code);
+        parent::__construct($message, $headers);
     }
 }

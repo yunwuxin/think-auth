@@ -12,9 +12,9 @@ namespace yunwuxin\auth\guard;
 
 use think\helper\Str;
 use think\Request;
+use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\Guard;
 use yunwuxin\auth\interfaces\Provider;
-use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\traits\GuardHelpers;
 
 class Token implements Guard
@@ -32,7 +32,7 @@ class Token implements Guard
     /**
      * 获取通过认证的用户
      *
-     * @return StatefulUser|null
+     * @return Authorizable|mixed|null
      */
     public function user()
     {
@@ -66,21 +66,6 @@ class Token implements Guard
         }
 
         return $token;
-    }
-
-    /**
-     * 认证用户
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function validate(array $credentials = [])
-    {
-        if ($this->provider->retrieveByCredentials($credentials)) {
-            return true;
-        }
-
-        return false;
     }
 
 }

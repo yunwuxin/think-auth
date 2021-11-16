@@ -13,11 +13,9 @@ namespace yunwuxin\auth\traits;
 
 use think\exception\ValidateException;
 use think\helper\Str;
-use think\Model;
 use think\Request;
 use think\Response;
 use think\Validate;
-use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\password\Broker;
 use yunwuxin\auth\password\Exception;
 use yunwuxin\facade\Auth;
@@ -80,13 +78,13 @@ trait ResetPassword
     }
 
     /**
-     * @param Model|StatefulUser    $user
-     * @param                       $password
+     * @param mixed $user
+     * @param string $password
      */
     protected function resetPassword($user, $password)
     {
         $user->save([
-            'password'       => encrypt($password),
+            'password'       => password_hash($password, PASSWORD_DEFAULT),
             'remember_token' => Str::random(60),
         ]);
 

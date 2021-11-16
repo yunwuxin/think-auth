@@ -15,7 +15,6 @@ use Closure;
 use think\Request;
 use yunwuxin\Auth;
 use yunwuxin\auth\exception\AuthorizationException;
-use yunwuxin\auth\interfaces\StatefulUser;
 use yunwuxin\auth\interfaces\Authorizable;
 
 /**
@@ -42,28 +41,28 @@ class Authorization
     public function handle($request, Closure $next)
     {
 
-        /** @var StatefulUser|Authorizable $user */
+        /** @var Authorizable $user */
         $user = $this->auth->user();
 
-        $routeInfo = $request->routeInfo();
+        $rule = $request->rule();
 
-        if (isset($routeInfo['option']['roles'])) {
-            if (!$user->hasRole($routeInfo['option']['roles'])) {
+        if ($rule) {
+            $roles = $rule->getOption('roles', []);
+            if (!empty($roles) && !$user->hasRole($roles)) {
                 throw new AuthorizationException();
             }
-        }
 
-        if (isset($routeInfo['option']['permissions'])) {
-            $permissions = $routeInfo['option']['permissions'];
+            $permissions = $rule->getOption('permissions', []);
+            $rest        = $rule->getOption('rest');
 
-            if (isset($routeInfo['option']['rest']) && $this->isAssoc($permissions)) {
+            if (!empty($permissions) && $rest && $this->isAssoc($permissions)) {
                 if (isset($permissions['*']) && !$user->hasPermission($permissions['*'], true)) {
                     throw new AuthorizationException;
                 }
-                if (isset($permissions[$routeInfo['option']['rest']]) && !$user->hasPermission($permissions[$routeInfo['option']['rest']], true)) {
+                if (isset($permissions[$rest]) && !$user->hasPermission($permissions[$rest], true)) {
                     throw new AuthorizationException;
                 }
-            } else if (!$user->hasPermission($permissions, true)) {
+            } elseif (!$user->hasPermission($permissions, true)) {
                 throw new AuthorizationException;
             }
         }

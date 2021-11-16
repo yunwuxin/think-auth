@@ -34,6 +34,9 @@ return [
             'model' => User::class,
         ],
     ],
+    'password'         => [
+        'provider' => 'user',
+    ],
     //设为false,则不注册路由
     'route'            => [
         'group'       => 'auth',
