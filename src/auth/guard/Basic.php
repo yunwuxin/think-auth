@@ -2,6 +2,7 @@
 
 namespace yunwuxin\auth\guard;
 
+use think\helper\Str;
 use think\Request;
 use yunwuxin\auth\exception\UnauthorizedHttpException;
 use yunwuxin\auth\interfaces\Provider;
@@ -42,13 +43,20 @@ class Basic extends Password
 
     protected function getCredentialsFromRequest()
     {
-        if (!$this->request->server('PHP_AUTH_USER')) {
-            return false;
+        $header = $this->request->header('Authorization');
+
+        if (!empty($header)) {
+            if (Str::startsWith($header, 'Basic ')) {
+                $token   = Str::substr($header, 6);
+                $decoded = base64_decode($token);
+                [$username, $password] = explode(':', $decoded);
+                return [
+                    'username' => $username,
+                    'password' => $password,
+                ];
+            }
         }
 
-        return [
-            'username' => $this->request->server('PHP_AUTH_USER'),
-            'password' => $this->request->server('PHP_AUTH_PW'),
-        ];
+        return false;
     }
 }

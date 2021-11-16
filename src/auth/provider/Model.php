@@ -84,7 +84,7 @@ class Model implements StatefulProvider
         $model = $this->createModel();
 
         return $model->where($model->getPk(), $id)
-                     ->where($model->getRememberTokenName(), $token)
+                     ->where($this->getFieldName('remember_token'), $token)
                      ->find();
     }
 
@@ -98,26 +98,17 @@ class Model implements StatefulProvider
         if (empty($credentials)) {
             return null;
         }
+        $password = $credentials['password'] ?? null;
+        unset($credentials['password']);
 
-        $data = [];
+        $user = $this->createModel()->where($credentials)->find();
 
-        foreach ($credentials as $key => $value) {
-            if (strpos($key, 'password') === false) {
-                $data[$key] = $value;
-            }
+        if (!$user ||
+            (isset($password) && !password_verify($password, $user->getAttr($this->getFieldName('password'))))) {
+            return null;
         }
 
-        $user = $this->createModel()->where($data)->find();
-
-        if (
-            $user
-            && isset($credentials['password'])
-            && password_verify($credentials['password'], $user->getAttr($this->getFieldName('password')))
-        ) {
-            return $user;
-        }
-
-        return null;
+        return $user;
     }
 
     protected function createModel()
