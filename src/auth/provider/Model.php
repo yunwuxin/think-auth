@@ -103,12 +103,21 @@ class Model implements StatefulProvider
 
         $user = $this->createModel()->where($credentials)->find();
 
-        if (!$user ||
-            (isset($password) && !password_verify($password, $user->getAttr($this->getFieldName('password'))))) {
-            return null;
+        if ($user && ((!isset($password) || $this->checkPassword($user, $password)))) {
+            return $user;
         }
 
-        return $user;
+        return null;
+    }
+
+    /**
+     * @param \think\Model $user
+     * @param string $password
+     * @return bool
+     */
+    protected function checkPassword($user, $password)
+    {
+        return password_verify($password, $user->getAttr($this->getFieldName('password')));
     }
 
     protected function createModel()
