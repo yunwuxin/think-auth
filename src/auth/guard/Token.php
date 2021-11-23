@@ -12,6 +12,7 @@ namespace yunwuxin\auth\guard;
 
 use think\helper\Str;
 use think\Request;
+use yunwuxin\auth\credentials\TokenCredentials;
 use yunwuxin\auth\interfaces\Authorizable;
 use yunwuxin\auth\interfaces\Guard;
 use yunwuxin\auth\interfaces\Provider;
@@ -45,9 +46,8 @@ class Token implements Guard
         $token = $this->getTokenFromRequest();
 
         if (!empty($token)) {
-            $user = $this->provider->retrieveByCredentials(
-                ['token' => $token]
-            );
+            $credentials = new TokenCredentials($token);
+            $user        = $this->provider->retrieveByCredentials($credentials);
         }
 
         return $this->user = $user;

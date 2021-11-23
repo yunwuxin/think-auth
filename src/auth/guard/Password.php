@@ -6,7 +6,7 @@ use yunwuxin\auth\interfaces\Guard;
 use yunwuxin\auth\interfaces\Provider;
 use yunwuxin\auth\traits\GuardHelpers;
 
-class Password implements Guard
+abstract class Password implements Guard
 {
     use GuardHelpers;
 

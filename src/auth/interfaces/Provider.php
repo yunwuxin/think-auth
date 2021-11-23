@@ -6,8 +6,8 @@ interface Provider
 {
     /**
      * 根据用户输入的数据获取用户
-     * @param array $credentials
+     * @param mixed $credentials
      * @return mixed
      */
-    public function retrieveByCredentials(array $credentials);
+    public function retrieveByCredentials($credentials);
 }

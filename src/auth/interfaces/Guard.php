@@ -11,6 +11,8 @@
 
 namespace yunwuxin\auth\interfaces;
 
+use yunwuxin\auth\credentials\BaseCredentials;
+
 interface Guard
 {
     /**
@@ -44,16 +46,9 @@ interface Guard
     /**
      * Validate a user's credentials.
      *
-     * @param array $credentials
+     * @param BaseCredentials $credentials
      * @return bool
      */
-    public function validate(array $credentials = []);
+    public function validate($credentials);
 
-    /**
-     * 登录（当前请求有效）
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function once(array $credentials = []);
 }

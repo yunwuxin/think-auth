@@ -11,6 +11,7 @@
 namespace yunwuxin\auth\provider;
 
 use think\helper\Arr;
+use yunwuxin\auth\credentials\PasswordCredential;
 use yunwuxin\auth\interfaces\StatefulProvider;
 use yunwuxin\auth\model\User;
 
@@ -19,6 +20,7 @@ class Model implements StatefulProvider
 
     protected $model;
     protected $fields = [
+        'username'       => 'username',
         'password'       => 'password',
         'remember_token' => 'remember_token',
     ];
@@ -31,7 +33,7 @@ class Model implements StatefulProvider
 
     protected function getFieldName($name)
     {
-        return Arr::get($this->fields, $name);
+        return Arr::get($this->fields, $name, $name);
     }
 
     /**
@@ -90,20 +92,18 @@ class Model implements StatefulProvider
 
     /**
      * 根据用户输入的数据获取用户
-     * @param array $credentials
+     * @param PasswordCredential $credentials
      * @return mixed
      */
-    public function retrieveByCredentials(array $credentials)
+    public function retrieveByCredentials($credentials)
     {
-        if (empty($credentials)) {
+        if (!$credentials instanceof PasswordCredential) {
             return null;
         }
-        $password = $credentials['password'] ?? null;
-        unset($credentials['password']);
 
-        $user = $this->createModel()->where($credentials)->find();
+        $user = $this->createModel()->where([$this->getFieldName('username') => $credentials->getUsername()])->find();
 
-        if ($user && ((!isset($password) || $this->checkPassword($user, $password)))) {
+        if ($user && $this->checkPassword($user, $credentials->getPassword())) {
             return $user;
         }
 

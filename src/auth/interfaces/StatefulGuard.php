@@ -18,7 +18,7 @@ namespace yunwuxin\auth\interfaces;
  */
 interface StatefulGuard extends Guard
 {
-    public function attempt(array $credentials = [], $remember = false);
+    public function attempt($credentials, $remember = false);
 
     /**
      * 设置登录用户

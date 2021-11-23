@@ -4,6 +4,7 @@ namespace yunwuxin\auth\guard;
 
 use think\helper\Str;
 use think\Request;
+use yunwuxin\auth\credentials\PasswordCredential;
 use yunwuxin\auth\exception\UnauthorizedHttpException;
 use yunwuxin\auth\interfaces\Provider;
 
@@ -11,7 +12,7 @@ class Basic extends Password
 {
     protected $request;
 
-    public function __construct(Request $request, Provider $provider)
+    public function __construct(Provider $provider, Request $request)
     {
         parent::__construct($provider);
         $this->request = $request;
@@ -24,21 +25,15 @@ class Basic extends Password
         }
     }
 
-    public function user()
+    protected function retrieveUser()
     {
-        if (!is_null($this->user)) {
-            return $this->user;
-        }
-
-        $user = null;
-
         $credentials = $this->getCredentialsFromRequest();
 
         if (!empty($credentials)) {
-            $user = $this->provider->retrieveByCredentials($credentials);
+            return $this->provider->retrieveByCredentials($credentials);
         }
 
-        return $this->user = $user;
+        return null;
     }
 
     protected function getCredentialsFromRequest()
@@ -50,10 +45,8 @@ class Basic extends Password
                 $token   = Str::substr($header, 6);
                 $decoded = base64_decode($token);
                 [$username, $password] = explode(':', $decoded);
-                return [
-                    'username' => $username,
-                    'password' => $password,
-                ];
+
+                return new PasswordCredential($username, $password);
             }
         }
 

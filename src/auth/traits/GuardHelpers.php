@@ -16,7 +16,7 @@ trait GuardHelpers
 
     protected $lastValidated;
 
-    public function validate(array $credentials = [])
+    public function validate($credentials)
     {
         $this->lastValidated = $this->provider->retrieveByCredentials($credentials);
         return !is_null($this->lastValidated);
@@ -27,23 +27,12 @@ trait GuardHelpers
         if (!is_null($this->user)) {
             return $this->user;
         }
+        return $this->user = $this->retrieveUser();
     }
 
-    /**
-     * 登录（当前请求有效）
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function once(array $credentials = [])
+    protected function retrieveUser()
     {
-        if ($this->validate($credentials)) {
-            $this->setUser($this->lastValidated);
-
-            return true;
-        }
-
-        return false;
+        return null;
     }
 
     public function authenticate()
