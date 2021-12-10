@@ -18,9 +18,10 @@ class Role
     /** @var string 角色名称 */
     protected $name;
 
-    public function __construct($name)
+    public function __construct($name, $permissions = [])
     {
-        $this->name = $name;
+        $this->name        = $name;
+        $this->permissions = $permissions;
     }
 
     public function getName()

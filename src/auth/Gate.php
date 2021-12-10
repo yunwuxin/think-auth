@@ -50,7 +50,7 @@ class Gate
 
         return array_map(function ($role) {
             if (is_string($role)) {
-                return new Role($role);
+                return new Role($role, [$role]);
             }
             return $role;
         }, $roles);
