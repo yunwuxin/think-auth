@@ -41,6 +41,22 @@ class Gate
     }
 
     /**
+     * @param User $user
+     * @return Role[]
+     */
+    protected function getRoles($user)
+    {
+        $roles = (array) $user->getRoles();
+
+        return array_map(function ($role) {
+            if (is_string($role)) {
+                return new Role($role);
+            }
+            return $role;
+        }, $roles);
+    }
+
+    /**
      * 是否具有某个角色
      *
      * @param array|string $name
@@ -66,7 +82,7 @@ class Gate
             }
             return $requireAll;
         } else {
-            foreach ($user->getRoles() as $role) {
+            foreach ($this->getRoles($user) as $role) {
                 if ($role->getName() == $name) {
                     return true;
                 }
@@ -88,7 +104,8 @@ class Gate
             return [];
         }
 
-        $roles       = $user->getRoles();
+        $roles = $this->getRoles($user);
+
         $permissions = [];
         array_map(function (Role $role) use (&$permissions) {
             $permissions = array_merge($permissions, $role->getPermissions());
@@ -154,7 +171,7 @@ class Gate
 
                 $ability = $this->formatAbilityToMethod($ability);
 
-                if (isset($args[0]) && is_string($args[0])) {
+                if (is_string($args[0])) {
                     array_shift($args);
                 }
 

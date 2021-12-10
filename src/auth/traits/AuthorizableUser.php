@@ -11,26 +11,26 @@
 
 namespace yunwuxin\auth\traits;
 
-use yunwuxin\facade\Gate;
 use yunwuxin\auth\Role;
+use yunwuxin\facade\Gate;
 
 trait AuthorizableUser
 {
     /**
      * 获取用户角色
      *
-     * @return Role[]
+     * @return Role[]|string|string[]
      */
     public function getRoles()
     {
-        throw new \LogicException('You must override the getRole() method in the concrete user class.');
+        return [];
     }
 
     /**
      * 是否具有某个角色
      *
      * @param array|string $name
-     * @param bool         $requireAll
+     * @param bool $requireAll
      * @return bool
      */
     public function hasRole($name, $requireAll = false)
