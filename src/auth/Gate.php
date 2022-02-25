@@ -11,6 +11,8 @@
 
 namespace yunwuxin\auth;
 
+use Exception;
+use ReflectionClass;
 use think\App;
 use think\Config;
 use think\helper\Str;
@@ -158,36 +160,80 @@ class Gate
 
     public function raw($ability, ...$args)
     {
-        $user   = $this->resolveUser();
+        $user = $this->resolveUser();
+
         $object = $args[0] ?? $user;
 
         if (!is_null($policy = $this->getPolicyFor($object))) {
-
             //前置检查
-            if (method_exists($policy, 'before')) {
-                $result = $policy->before($user, $ability, ...$args);
-                if (!is_null($result)) {
-                    return $result;
-                }
+            $result = $this->callPolicyBefore(
+                $policy, $user, $ability, $args
+            );
+
+            if (!is_null($result)) {
+                return $result;
             }
 
-            $ability = $this->formatAbilityToMethod($ability);
+            $method = $this->formatAbilityToMethod($ability);
 
-            if (is_string($args[0])) {
-                array_shift($args);
-            }
-
-            if (is_callable([$policy, $ability])) {
-                return $policy->{$ability}($user, ...$args);
-            }
-
-            if (!empty($args)) {
-                return false;
-            }
+            return $this->callPolicyMethod($policy, $method, $user, $args);
         }
 
         //直接检查角色里的权限列表定义
         return $this->hasPermission($ability, true);
+    }
+
+    protected function callPolicyMethod($policy, $method, $user, $arguments)
+    {
+        if (isset($arguments[0]) && is_string($arguments[0])) {
+            array_shift($arguments);
+        }
+
+        if (!is_callable([$policy, $method])) {
+            return;
+        }
+
+        if ($this->canBeCalledWithUser($user, $policy, $method)) {
+            return $policy->{$method}($user, ...$arguments);
+        }
+    }
+
+    protected function callPolicyBefore($policy, $user, $ability, $arguments)
+    {
+        if (!method_exists($policy, 'before')) {
+            return;
+        }
+
+        if ($this->canBeCalledWithUser($user, $policy, 'before')) {
+            return $policy->before($user, $ability, ...$arguments);
+        }
+    }
+
+    protected function canBeCalledWithUser($user, $object, $method)
+    {
+        if (!is_null($user)) {
+            return true;
+        }
+
+        try {
+            $reflection = new ReflectionClass($object);
+
+            $method = $reflection->getMethod($method);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        if ($method) {
+            $parameters = $method->getParameters();
+
+            if (isset($parameters[0])) {
+                $parameter = $parameters[0];
+                return ($parameter->hasType() && $parameter->allowsNull()) ||
+                    ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
+            }
+        }
+
+        return false;
     }
 
     protected function formatAbilityToMethod($ability)
@@ -216,7 +262,7 @@ class Gate
         }
 
         if ($this->policyNamespace) {
-            $class = $this->policyNamespace . join('', array_slice(explode('\\', $class), -1)) . 'Policy';
+            $class = $this->policyNamespace . class_basename($class) . 'Policy';
             return $this->resolvePolicy($class);
         }
     }
