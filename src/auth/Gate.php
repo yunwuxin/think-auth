@@ -60,7 +60,7 @@ class Gate
      * 是否具有某个角色
      *
      * @param array|string $name
-     * @param bool $requireAll
+     * @param bool         $requireAll
      * @return bool
      */
     public function hasRole($name, $requireAll = false)
@@ -149,7 +149,7 @@ class Gate
      *
      * @param       $ability
      * @param array $args
-     * @return bool|mixed
+     * @return bool
      */
     public function can($ability, ...$args)
     {
@@ -218,11 +218,7 @@ class Gate
 
     protected function resolvePolicy($class)
     {
-        static $policies;
-        if (!isset($policies[$class])) {
-            $policies[$class] = new $class;
-        }
-        return $policies[$class];
+        return $this->app->make($class);
     }
 
     /**
