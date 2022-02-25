@@ -158,26 +158,31 @@ class Gate
 
     public function raw($ability, ...$args)
     {
-        if (isset($args[0])) {
-            if (!is_null($policy = $this->getPolicyFor($args[0]))) {
-                $user = $this->resolveUser();
-                //前置检查
-                if (method_exists($policy, 'before')) {
-                    $result = $policy->before($user, $ability, ...$args);
-                    if (!is_null($result)) {
-                        return $result;
-                    }
+        $user   = $this->resolveUser();
+        $object = $args[0] ?? $user;
+
+        if (!is_null($policy = $this->getPolicyFor($object))) {
+
+            //前置检查
+            if (method_exists($policy, 'before')) {
+                $result = $policy->before($user, $ability, ...$args);
+                if (!is_null($result)) {
+                    return $result;
                 }
+            }
 
-                $ability = $this->formatAbilityToMethod($ability);
+            $ability = $this->formatAbilityToMethod($ability);
 
-                if (is_string($args[0])) {
-                    array_shift($args);
-                }
+            if (is_string($args[0])) {
+                array_shift($args);
+            }
 
-                return is_callable([$policy, $ability])
-                    ? $policy->{$ability}($user, ...$args)
-                    : false;
+            if (is_callable([$policy, $ability])) {
+                return $policy->{$ability}($user, ...$args);
+            }
+
+            if (!empty($args)) {
+                return false;
             }
         }
 
