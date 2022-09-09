@@ -17,6 +17,7 @@ use think\App;
 use think\Config;
 use think\helper\Str;
 use yunwuxin\Auth;
+use yunwuxin\auth\interfaces\PolicyResolver;
 use yunwuxin\auth\traits\AuthorizableUser as User;
 
 class Gate
@@ -62,7 +63,7 @@ class Gate
      * 是否具有某个角色
      *
      * @param array|string $name
-     * @param bool         $requireAll
+     * @param bool $requireAll
      * @return bool
      */
     public function hasRole($name, $requireAll = false)
@@ -164,7 +165,7 @@ class Gate
 
         $object = $args[0] ?? $user;
 
-        if (!is_null($policy = $this->getPolicyFor($object))) {
+        if (!is_null($policy = $this->getPolicyFor($object, $user))) {
             //前置检查
             $result = $this->callPolicyBefore(
                 $policy, $user, $ability, $args
@@ -241,7 +242,7 @@ class Gate
         return strpos($ability, '-') !== false ? Str::camel($ability) : $ability;
     }
 
-    protected function getPolicyFor($class)
+    protected function getPolicyFor($class, $user)
     {
         if (is_object($class)) {
             $class = get_class($class);
@@ -251,23 +252,30 @@ class Gate
             return null;
         }
 
+        if ($user instanceof PolicyResolver) {
+            $policy = $user->resolvePolicy($class);
+            if ($policy) {
+                return $this->makePolicy($policy);
+            }
+        }
+
         if (isset($this->policies[$class])) {
-            return $this->resolvePolicy($this->policies[$class]);
+            return $this->makePolicy($this->policies[$class]);
         }
 
         foreach ($this->policies as $expected => $policy) {
             if (is_subclass_of($class, $expected)) {
-                return $this->resolvePolicy($policy);
+                return $this->makePolicy($policy);
             }
         }
 
         if ($this->policyNamespace) {
             $class = $this->policyNamespace . class_basename($class) . 'Policy';
-            return $this->resolvePolicy($class);
+            return $this->makePolicy($class);
         }
     }
 
-    protected function resolvePolicy($class)
+    protected function makePolicy($class)
     {
         return $this->app->make($class);
     }
