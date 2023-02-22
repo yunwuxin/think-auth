@@ -11,6 +11,7 @@
 
 namespace yunwuxin;
 
+use Closure;
 use InvalidArgumentException;
 use think\helper\Arr;
 use think\helper\Str;
@@ -31,6 +32,12 @@ class Auth extends Manager
     protected $namespace = '\\yunwuxin\\auth\\guard\\';
 
     protected $default = null;
+    /**
+     * The registered custom driver creators.
+     *
+     * @var array
+     */
+    protected $customCreators = [];
 
     public function shouldUse($name)
     {
@@ -149,5 +156,56 @@ class Auth extends Manager
     public function getDefaultDriver()
     {
         return $this->default ?? $this->getConfig('default');
+    }
+
+    /**
+     * 创建驱动
+     *
+     * @param string $name
+     * @return mixed
+     *
+     */
+    protected function createDriver(string $name)
+    {
+        $driver = $this->resolveType($name);
+        if (is_null($driver)) {
+            throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
+        }
+        $params = $this->resolveParams($name);
+
+        if (isset($this->customCreators[$driver])) {
+            return $this->callCustomCreator($driver, $params);
+        }
+        $method = 'create' . Str::studly($driver) . 'Driver';
+        if (method_exists($this, $method)) {
+            return $this->$method(...$params);
+        }
+        $class = $this->resolveClass($driver);
+
+        return $this->app->invokeClass($class, $params);
+    }
+
+    /**
+     * Call a custom driver creator.
+     *
+     * @param  string  $driver
+     * @return mixed
+     */
+    protected function callCustomCreator($driver, array $params)
+    {
+        return $this->customCreators[$driver]($this->app, $driver, $params);
+    }
+
+    /**
+     * Register a custom driver creator Closure.
+     *
+     * @param  string  $driver
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function extend($driver, Closure $callback)
+    {
+        $this->customCreators[$driver] = $callback;
+        return $this;
     }
 }
