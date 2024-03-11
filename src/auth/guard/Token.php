@@ -10,62 +10,13 @@
 // +----------------------------------------------------------------------
 namespace yunwuxin\auth\guard;
 
-use think\helper\Str;
-use think\Request;
 use yunwuxin\auth\credentials\TokenCredentials;
-use yunwuxin\auth\interfaces\Authorizable;
-use yunwuxin\auth\interfaces\Guard;
-use yunwuxin\auth\interfaces\Provider;
-use yunwuxin\auth\traits\GuardHelpers;
 
-class Token implements Guard
+class Token extends Request
 {
-    use GuardHelpers;
-
-    protected $request;
-
-    public function __construct(Request $request, Provider $provider)
+    protected function retrieveUser()
     {
-        $this->provider = $provider;
-        $this->request  = $request;
+        $credentials = new TokenCredentials($this->request);
+        return $this->provider->retrieveByCredentials($credentials);
     }
-
-    /**
-     * 获取通过认证的用户
-     *
-     * @return Authorizable|mixed|null
-     */
-    public function user()
-    {
-        if (!is_null($this->user)) {
-            return $this->user;
-        }
-
-        $user = null;
-
-        $token = $this->getTokenFromRequest();
-
-        if (!empty($token)) {
-            $credentials = new TokenCredentials($token);
-            $user        = $this->provider->retrieveByCredentials($credentials);
-        }
-
-        return $this->user = $user;
-    }
-
-    protected function getTokenFromRequest()
-    {
-        $token = $this->request->param('access-token');
-        if (empty($token)) {
-            $header = $this->request->header('Authorization');
-            if (!empty($header)) {
-                if (Str::startsWith($header, 'Bearer ')) {
-                    $token = Str::substr($header, 7);
-                }
-            }
-        }
-
-        return $token;
-    }
-
 }

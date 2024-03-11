@@ -12,7 +12,6 @@ class Request implements Guard
     use GuardHelpers;
 
     protected $request;
-    protected $callback;
 
     public function __construct(Provider $provider, \think\Request $request)
     {
