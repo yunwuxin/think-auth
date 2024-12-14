@@ -53,7 +53,7 @@ class Auth extends Manager
      * @param mixed $default 默认值
      * @return mixed
      */
-    public function getConfig(string $name = null, $default = null)
+    public function getConfig(?string $name = null, $default = null)
     {
         if (!is_null($name)) {
             return $this->app->config->get('auth.' . $name, $default);
@@ -69,7 +69,7 @@ class Auth extends Manager
      * @param null $default
      * @return mixed
      */
-    public function getGuardConfig(string $guard, string $name = null, $default = null)
+    public function getGuardConfig(string $guard, ?string $name = null, $default = null)
     {
         if ($config = $this->getConfig("guards.{$guard}")) {
             return Arr::get($config, $name, $default);
@@ -85,7 +85,7 @@ class Auth extends Manager
      * @param null $default
      * @return mixed
      */
-    public function getProviderConfig(string $provider, string $name = null, $default = null)
+    public function getProviderConfig(string $provider, ?string $name = null, $default = null)
     {
         if ($config = $this->getConfig("providers.{$provider}")) {
             return Arr::get($config, $name, $default);
@@ -118,17 +118,15 @@ class Auth extends Manager
     {
         $config = $this->resolveConfig($name);
 
-        $providerName = $this->getGuardConfig($name, 'provider');
+        $providerConfig = $this->getGuardConfig($name, 'provider');
 
-        $provider = $this->createUserProvider($providerName);
+        $provider = $this->createUserProvider($providerConfig);
 
         return [$provider, $config];
     }
 
-    public function createUserProvider($provider)
+    public function createUserProvider($config)
     {
-        $config = $this->getProviderConfig($provider);
-
         $type = Arr::pull($config, 'type');
 
         $namespace = '\\yunwuxin\\auth\\provider\\';

@@ -12,16 +12,14 @@ namespace yunwuxin\auth\model;
 
 use think\Model;
 use yunwuxin\auth\interfaces\Authorizable;
-use yunwuxin\auth\interfaces\CanResetPassword;
 use yunwuxin\auth\traits\AuthorizableUser;
-use yunwuxin\auth\traits\CanResetPasswordUser;
 
 /**
  * 默认用户模型
  * Class User
  * @package think\auth\model
  */
-class User extends Model implements Authorizable, CanResetPassword
+class User extends Model implements Authorizable
 {
-    use AuthorizableUser, CanResetPasswordUser;
+    use AuthorizableUser;
 }

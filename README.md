@@ -1,4 +1,4 @@
-# ThinkPHP6 权限认证
+# ThinkPHP 权限认证
 
 ## 安装
 ~~~

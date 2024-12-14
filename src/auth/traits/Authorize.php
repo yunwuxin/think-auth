@@ -38,7 +38,7 @@ trait Authorize
         if (preg_match('/^authorize_(\w+)(?:\|([\w\\\]+))?$/', $method, $match)) {
 
             $ability = $match[1];
-            $object  = isset($match[2]) ? $match[2] : null;
+            $object = $match[2] ?? null;
             if (isset($match[2]) && isset($this->{$match[2]})) {
                 $object = $this->{$match[2]};
             }

@@ -35,7 +35,7 @@ class Gate
 
     protected static $instance = [];
 
-    public function __construct(App $app, callable $userResolver, array $policies = [], string $policyNamespace = null)
+    public function __construct(App $app, callable $userResolver, array $policies = [], ?string $policyNamespace = null)
     {
         $this->app             = $app;
         $this->userResolver    = $userResolver;

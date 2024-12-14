@@ -11,6 +11,9 @@ namespace yunwuxin\auth\traits;
 use yunwuxin\auth\Collection;
 use yunwuxin\facade\Gate;
 
+/**
+ * @mixin \think\Model
+ */
 trait PoliciesModel
 {
     public function withPolicies($abilities)
@@ -19,7 +22,7 @@ trait PoliciesModel
             $abilities = explode(',', $abilities);
         }
 
-        $this->withAttr('policies', function () use ($abilities) {
+        $this->withFieldAttr('policies', function () use ($abilities) {
             $data = [];
             foreach ($abilities as $ability) {
                 $data[$ability] = Gate::can($ability, $this);
@@ -32,7 +35,7 @@ trait PoliciesModel
         return $this;
     }
 
-    public function toCollection(iterable $collection = [], string $resultSetType = null): \think\Collection
+    public function toCollection(iterable $collection = [], ?string $resultSetType = null): \think\Collection
     {
         return parent::toCollection($collection, Collection::class);
     }

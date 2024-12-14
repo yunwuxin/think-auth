@@ -13,7 +13,7 @@ class RequestCredentials extends BaseCredentials
     }
 
     /**
-     * @return Request|\app\Request
+     * @return Request
      */
     public function getRequest()
     {

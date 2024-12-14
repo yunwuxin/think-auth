@@ -65,7 +65,7 @@ trait AuthorizableUser
      *
      * @param       $ability
      * @param array $args
-     * @return bool|mixed
+     * @return bool
      */
     public function can($ability, ...$args)
     {

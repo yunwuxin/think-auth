@@ -1,8 +1,7 @@
 {
     "name": "yunwuxin/think-auth",
     "license": "Apache-2.0",
-    "type": "think-extend",
-    "description": "The Auth Library For ThinkPHP5",
+    "description": "The Auth Library For ThinkPHP",
     "authors": [
         {
             "name": "yunwuxin",
@@ -13,12 +12,7 @@
         "topthink/framework": "^6.0 || ^8.0"
     },
     "require-dev": {
-        "yunwuxin/think-notification": "^3.0",
-        "yunwuxin/think-mail": "^3.0"
-    },
-    "suggest": {
-        "yunwuxin/think-notification": "Required to send notification.",
-        "yunwuxin/think-mail": "Required to send email."
+        "pestphp/pest": "^1.23"
     },
     "autoload": {
         "psr-4": {
@@ -30,12 +24,14 @@
     },
     "extra": {
         "think": {
-            "services": [
-                "yunwuxin\\auth\\Service"
-            ],
             "config": {
                 "auth": "src/config.php"
             }
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     }
 }
